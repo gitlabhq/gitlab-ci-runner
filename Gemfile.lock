@@ -26,6 +26,9 @@ GEM
     guard-rspec (3.0.1)
       guard (>= 1.8)
       rspec (~> 2.13)
+    httparty (0.11.0)
+      multi_json (~> 1.0)
+      multi_xml (>= 0.5.2)
     listen (1.1.4)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
@@ -34,6 +37,7 @@ GEM
     method_source (0.8.1)
     mime-types (1.23)
     multi_json (1.7.4)
+    multi_xml (0.5.3)
     pry (0.9.12.2)
       coderay (~> 1.0.5)
       method_source (~> 0.8)
@@ -73,6 +77,8 @@ DEPENDENCIES
   coveralls
   guard
   guard-rspec
+  httparty
+  pry
   rspec
   vcr
   webmock
