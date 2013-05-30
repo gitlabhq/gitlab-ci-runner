@@ -24,7 +24,7 @@ module GitlabCi
         headers: {"Content-Type" => "application/json"},
       }
 
-      response = self.class.post(url + '/api/v1/builds/register.json', opts)
+      response = self.class.post(api_url + '/builds/register.json', opts)
 
       if response.code == 201
         {
@@ -34,11 +34,10 @@ module GitlabCi
           ref: response['sha'],
         }
       else
-        nil
+        puts 'nothing'
       end
     rescue
       puts 'failed'
-      nil
     end
 
     def update_build(id, state, trace)
@@ -48,13 +47,13 @@ module GitlabCi
         trace: trace,
       )
 
-      self.class.put("#{url}/builds/#{id}.json", body: options)
+      self.class.put("#{api_url}/builds/#{id}.json", body: options)
     end
 
     private
 
-    def url
-      config.url
+    def api_url
+      config.url + '/api/v1'
     end
 
     def token
