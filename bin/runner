@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
+require 'rubygems'
+require 'bundler/setup'
+
 require_relative '../lib/runner'
 
 GitlabCi::Runner.new
 exit
-
