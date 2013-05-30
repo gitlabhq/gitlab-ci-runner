@@ -1,18 +1,17 @@
 require_relative 'build'
+require_relative 'network'
 
 module GitlabCi
   class Runner
-    attr_accessor :current_build, :token, :thread
+    attr_accessor :current_build, :thread
 
     def initialize
       puts '* Gitlab CI Runner started'
       puts '* Waiting for builds'
 
       loop do
-        if completed?
-          submit_build
-        elsif running?
-          send_trace
+        if running?
+          update_build
         else
           get_build
         end
@@ -21,27 +20,28 @@ module GitlabCi
       end
     end
 
-    def completed?
-      @current_build && @current_build.completed?
-    end
+    private
 
     def running?
       @current_build
     end
 
-    def send_trace
-      puts collect_trace
-    end
-
-    def submit_build
-      send_trace
-      puts "Completed build #{@current_build.id}"
+    def update_build
       puts "Submiting build #{@current_build.id} to coordinator..."
-      @current_build = nil
+      network.update_build(
+        @current_build.id,
+        @current_build.state,
+        @current_build.trace
+      )
+
+      if @current_build.completed?
+        puts "Completed build #{@current_build.id}"
+        @current_build = nil
+      end
     end
 
     def get_build
-      build_data = get_pending_build
+      build_data = network.get_build
 
       if build_data
         run(build_data)
@@ -50,19 +50,8 @@ module GitlabCi
       end
     end
 
-    def token
-      @token ||= File.read(File.expand_path(File.join(File.dirname(__FILE__), 'support', "token")))
-    end
-
-    def get_pending_build
-      # check for available build from coordinator
-      # and pick a pending one
-      {
-        commands: ['ls -la'],
-        path: '/home/git/testproject',
-        ref: '3ee2b0fda79b326692135f5fb69da8c2eb557709',
-        id: 657
-      }
+    def network
+      @network ||= Network.new
     end
 
     def run(build_data)
