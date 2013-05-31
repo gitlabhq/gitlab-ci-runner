@@ -10,7 +10,7 @@ module GitlabCi
       puts '* Waiting for builds'
 
       loop do
-        if running?
+        if completed? || running?
           update_build
         else
           get_build
@@ -26,18 +26,27 @@ module GitlabCi
       @current_build
     end
 
+    def completed?
+      @current_build && @current_build.completed?
+    end
+
     def update_build
-      puts "Submiting build #{@current_build.id} to coordinator..."
+      if @current_build.completed?
+        if push_build
+          puts "Completed build #{@current_build.id}"
+          @current_build = nil
+        end
+      else
+        push_build
+      end
+    end
+
+    def push_build
       network.update_build(
         @current_build.id,
         @current_build.state,
         @current_build.trace
       )
-
-      if @current_build.completed?
-        puts "Completed build #{@current_build.id}"
-        @current_build = nil
-      end
     end
 
     def get_build
