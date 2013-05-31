@@ -1,25 +1,36 @@
 require_relative 'encode'
+require_relative 'config'
 
 require 'childprocess'
 require 'tempfile'
+require 'fileutils'
 
 module GitlabCi
   class Build
     TIMEOUT = 3600
 
-    attr_accessor :id, :commands, :path, :ref, :tmp_file_path, :output, :state
+    attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :state
 
-    def initialize(id, commands, path, ref)
-      @commands = commands
-      @path = path
-      @ref = ref
-      @id = id
+    def initialize(data)
+      @commands = data[:commands]
+      @ref = data[:ref]
+      @id = data[:id]
+      @project_id = data[:project_id]
+      @repo_url = data[:repo_url]
       @state = :waiting
     end
 
     def run
       @state = :running
-      @commands.unshift git_cmd
+
+      @commands.unshift(checkout_cmd)
+
+      if repo_exists?
+        @commands.unshift(fetch_cmd)
+      else
+        FileUtils.mkdir_p(project_dir)
+        @commands.unshift(clone_cmd)
+      end
 
       @commands.each do |line|
         status = command line
@@ -68,10 +79,10 @@ module GitlabCi
       @tmp_file = Tempfile.new("child-output", binmode: true)
       @process.io.stdout = @tmp_file
       @process.io.stderr = @tmp_file
-      @process.cwd = @path
+      @process.cwd = project_dir
 
       # ENV
-      @process.environment['BUNDLE_GEMFILE'] = File.join(@path, 'Gemfile')
+      @process.environment['BUNDLE_GEMFILE'] = File.join(project_dir, 'Gemfile')
       @process.environment['BUNDLE_BIN_PATH'] = ''
       @process.environment['RUBYOPT'] = ''
 
@@ -108,13 +119,40 @@ module GitlabCi
       @tmp_file.unlink
     end
 
-    def git_cmd
+    def checkout_cmd
       cmd = []
-      cmd << "cd #{@path}"
-      cmd << "git fetch"
+      cmd << "cd #{project_dir}"
       cmd << "git reset --hard"
       cmd << "git checkout #{@ref}"
       cmd.join(" && ")
+    end
+
+    def clone_cmd
+      cmd = []
+      cmd << "cd #{config.builds_dir}"
+      cmd << "git clone #{@repo_url} project-#{@project_id}"
+      cmd.join(" && ")
+    end
+
+    def fetch_cmd
+      cmd = []
+      cmd << "cd #{project_dir}"
+      cmd << "git reset --hard"
+      cmd << "git clean -f"
+      cmd << "git fetch"
+      cmd.join(" && ")
+    end
+
+    def repo_exists?
+      File.exists?(File.join(project_dir, '.git'))
+    end
+
+    def config
+      @config ||= Config.new
+    end
+
+    def project_dir
+      File.join(config.builds_dir, "project-#{@project_id}")
     end
   end
 end

@@ -17,5 +17,9 @@ module GitlabCi
     def url
       @config['url']
     end
+
+    def builds_dir
+      @builds_path ||= File.join(ROOT_PATH, 'tmp', 'builds')
+    end
   end
 end

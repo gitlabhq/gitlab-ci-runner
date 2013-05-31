@@ -29,8 +29,9 @@ module GitlabCi
       if response.code == 201
         {
           id: response['id'],
+          project_id: response['project_id'],
           commands: response['commands'].lines,
-          path: response['path'],
+          repo_url: response['repo_url'],
           ref: response['sha'],
         }
       else
