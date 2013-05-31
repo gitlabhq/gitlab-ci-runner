@@ -17,7 +17,7 @@ module GitlabCi
     #   id: rand(1900)
     # }
     def get_build
-      print 'Checking for builds...'
+      broadcast 'Checking for builds...'
 
       opts = {
         body: default_options.to_json,
@@ -27,6 +27,7 @@ module GitlabCi
       response = self.class.post(api_url + '/builds/register.json', opts)
 
       if response.code == 201
+        puts 'received'
         {
           id: response['id'],
           project_id: response['project_id'],
@@ -44,7 +45,7 @@ module GitlabCi
     end
 
     def update_build(id, state, trace)
-      print "Submiting build #{id} to coordinator..."
+      broadcast "Submiting build #{id} to coordinator..."
 
       options = default_options.merge(
         state: state,
@@ -85,6 +86,10 @@ module GitlabCi
     end
 
     private
+
+    def broadcast message
+      print "#{Time.now.to_s} | #{message}"
+    end
 
     def api_url
       config.url + '/api/v1'
