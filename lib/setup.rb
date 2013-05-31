@@ -29,7 +29,7 @@ module GitlabCi
       public_key = File.read(File.expand_path('~/.ssh/id_rsa.pub'))
 
       until registered
-        puts 'Please type gitlab-ci admin token: '
+        puts 'Please type gitlab-ci runners token: '
         token = gets.chomp
 
         runner = Network.new.register_runner(public_key, token)
