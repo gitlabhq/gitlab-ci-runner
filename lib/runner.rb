@@ -55,12 +55,7 @@ module GitlabCi
     end
 
     def run(build_data)
-      @current_build = GitlabCi::Build.new(
-        build_data[:id],
-        build_data[:commands],
-        build_data[:path],
-        build_data[:ref],
-      )
+      @current_build = GitlabCi::Build.new(build_data)
 
       Thread.abort_on_exception = true
 
