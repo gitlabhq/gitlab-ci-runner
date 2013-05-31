@@ -29,6 +29,7 @@ GEM
     httparty (0.11.0)
       multi_json (~> 1.0)
       multi_xml (>= 0.5.2)
+    json (1.7.7)
     listen (1.1.4)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
@@ -78,6 +79,7 @@ DEPENDENCIES
   guard
   guard-rspec
   httparty
+  json (~> 1.7.7)
   pry
   rspec
   vcr

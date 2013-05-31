@@ -12,7 +12,7 @@ module GitlabCi
     attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :state
 
     def initialize(data)
-      @commands = data[:commands]
+      @commands = data[:commands].to_a
       @ref = data[:ref]
       @id = data[:id]
       @project_id = data[:project_id]
