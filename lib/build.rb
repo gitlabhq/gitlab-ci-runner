@@ -7,7 +7,7 @@ require 'fileutils'
 
 module GitlabCi
   class Build
-    TIMEOUT = 3600
+    TIMEOUT = 7200
 
     attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :state
 
