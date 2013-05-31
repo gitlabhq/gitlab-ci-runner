@@ -57,9 +57,9 @@ module GitlabCi
     end
 
     def trace
-      return output if completed?
-
-      File.read(tmp_file_path)
+      trace = output
+      trace << File.read(tmp_file_path) if File.exists?(tmp_file_path)
+      trace
     rescue
       ''
     end
