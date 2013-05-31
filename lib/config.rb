@@ -7,7 +7,11 @@ module GitlabCi
     attr_reader :config
 
     def initialize
-      @config = YAML.load_file(File.join(ROOT_PATH, 'config.yml'))
+      if File.exists?(config_path)
+        @config = YAML.load_file(config_path)
+      else
+        @config = {}
+      end
     end
 
     def token
@@ -20,6 +24,20 @@ module GitlabCi
 
     def builds_dir
       @builds_path ||= File.join(ROOT_PATH, 'tmp', 'builds')
+    end
+
+    def write(key, value)
+      @config[key] = value
+
+      File.open(config_path, "w") do |f|
+        f.write(@config.to_yaml)
+      end
+    end
+
+    private
+
+    def config_path
+      File.join(ROOT_PATH, 'config.yml')
     end
   end
 end
