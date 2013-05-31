@@ -34,6 +34,8 @@ module GitlabCi
           repo_url: response['repo_url'],
           ref: response['sha'],
         }
+      elsif response.code == 403
+        puts 'forbidden'
       else
         puts 'nothing'
       end
@@ -49,6 +51,26 @@ module GitlabCi
       )
 
       self.class.put("#{api_url}/builds/#{id}.json", body: options)
+    end
+
+    def register_runner(public_key, token)
+      body = {
+        public_key: public_key,
+        token: token
+      }
+
+      opts = {
+        body: body.to_json,
+        headers: {"Content-Type" => "application/json"},
+      }
+
+      response = self.class.post(api_url + '/runners/register.json', opts)
+
+      if response.code == 201
+        {
+          token: response['token']
+        }
+      end
     end
 
     private
