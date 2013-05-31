@@ -33,7 +33,7 @@ module GitlabCi
     def update_build
       if @current_build.completed?
         if push_build
-          puts "Completed build #{@current_build.id}"
+          puts "#{Time.now.to_s} | Completed build #{@current_build.id}"
           @current_build = nil
         end
       else
@@ -69,7 +69,7 @@ module GitlabCi
       Thread.abort_on_exception = true
 
       Thread.new(@current_build) do
-        puts "Build #{@current_build.id} started.."
+        puts "#{Time.now.to_s} | Build #{@current_build.id} started.."
 
         @current_build.run
       end
