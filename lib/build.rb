@@ -57,11 +57,14 @@ module GitlabCi
     end
 
     def trace
-      trace = output
-      trace << File.read(tmp_file_path) if File.exists?(tmp_file_path)
-      trace
+      output + tmp_file_output
     rescue
       ''
+    end
+
+    def tmp_file_output
+      tmp_file_output = GitlabCi::Encode.encode!(File.binread(tmp_file_path)) if tmp_file_path && File.readable?(tmp_file_path)
+      tmp_file_output ||= ''
     end
 
     private

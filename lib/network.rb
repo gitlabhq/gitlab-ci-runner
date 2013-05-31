@@ -44,13 +44,24 @@ module GitlabCi
     end
 
     def update_build(id, state, trace)
+      print "Submiting build #{id} to coordinator..."
 
       options = default_options.merge(
         state: state,
         trace: trace,
       )
 
-      self.class.put("#{api_url}/builds/#{id}.json", body: options)
+      response = self.class.put("#{api_url}/builds/#{id}.json", body: options)
+
+      if response.code == 200
+        puts 'ok'
+        true
+      else
+        puts 'failed'
+      end
+    rescue
+      puts 'failed'
+      false
     end
 
     def register_runner(public_key, token)
