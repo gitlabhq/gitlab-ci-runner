@@ -25,6 +25,9 @@ git clone https://github.com/gitlabhq/gitlab-ci-runner.git
 # Enter code dir
 cd gitlab-ci-runner
 
+# Install dependencies
+bundle install
+
 # Install runner in interactive mode
 ./bin/install
 ```
