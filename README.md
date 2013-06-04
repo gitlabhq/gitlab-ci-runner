@@ -26,14 +26,15 @@ git clone https://github.com/gitlabhq/gitlab-ci-runner.git
 cd gitlab-ci-runner
 
 # Install dependencies
+gem install bundler
 bundle install
 
 # Install runner in interactive mode
-./bin/install
+bundle exec ./bin/install
 ```
 
 ### Run
 
 ```bash
-./bin/runner
+bundle exec ./bin/runner
 ```
