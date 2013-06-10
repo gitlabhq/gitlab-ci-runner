@@ -8,7 +8,7 @@ module GitlabCi
       build_config
 
       rebuild_key = false
-      check_key = File.read(File.expand_path('~/.ssh/id_rsa.pub'))
+      check_key = File.exist(File.expand_path('~/.ssh/id_rsa.pub'))
       if check_key
           puts 'Rebuild SSH Key'
           get_rebuild = gets.chomp
