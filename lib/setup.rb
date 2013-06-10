@@ -6,7 +6,27 @@ module GitlabCi
   class Setup
     def initialize
       build_config
-      generate_ssh_key
+
+      rebuild_key = false
+      check_key = File.exist?(File.expand_path('~/.ssh/id_rsa.pub'))
+      if check_key
+          puts 'Rebuild SSH Key'
+          get_rebuild = gets.chomp
+          if get_rebuild == 'y'
+              rebuild_key = true
+          elsif get_rebuild == 'yes'
+              rebuild_key = true
+          else
+              rebuild_key = false
+          end
+      else
+          rebuild_key = true
+      end               
+
+      if rebuild_key
+          generate_ssh_key
+      end
+
       register_runner
     end
 
