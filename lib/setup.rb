@@ -14,7 +14,7 @@ module GitlabCi
           get_rebuild = gets.chomp
           if get_rebuild == 'y'
               rebuild_key = true
-          else if get_rebuild == 'yes'
+          elsif get_rebuild == 'yes'
               rebuild_key = true
           else
               rebuild_key = false
