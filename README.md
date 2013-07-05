@@ -31,6 +31,9 @@ bundle install
 
 # Install runner in interactive mode
 bundle exec ./bin/install
+
+# SSH into your GitLab server and confirm to add host key to known_hosts
+ssh git@<your gitlab url>
 ```
 
 ### Run
