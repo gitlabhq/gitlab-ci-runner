@@ -14,6 +14,7 @@ module GitlabCi
     def initialize(data)
       @commands = data[:commands].to_a
       @ref = data[:ref]
+      @ref_name = data[:ref_name]
       @id = data[:id]
       @project_id = data[:project_id]
       @repo_url = data[:repo_url]
@@ -95,6 +96,7 @@ module GitlabCi
       @process.environment['CI_SERVER_REVISION'] = nil# GitlabCi::Revision
 
       @process.environment['CI_BUILD_REF'] = @ref
+      @process.environment['CI_BUILD_REF_NAME'] = @ref_name
 
       @process.start
 

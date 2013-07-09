@@ -34,6 +34,7 @@ module GitlabCi
           commands: response['commands'].lines,
           repo_url: response['repo_url'],
           ref: response['sha'],
+          ref_name: response['ref'],
         }
       elsif response.code == 403
         puts 'forbidden'
