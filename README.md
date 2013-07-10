@@ -4,7 +4,7 @@
 
 ![Screen](https://github.com/downloads/gitlabhq/gitlab-ci/gitlab_ci_preview.png)
 
-## This is Runner repository. This code responsible for running tests
+## This is Runner repository. This code will only run tests. For more information and the test coordinator please see the gitlab-ci repo.
 
 ### Requirements
 
