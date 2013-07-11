@@ -54,7 +54,7 @@ start() {
       for (( i=1; i<=$RUNNERS_NUM; i++ ))
       do
         echo "Starting runner #$i"
-        execute "$START_RUNNER  > /dev/null 2>&1 & echo \$! >> $RUNNERS_PID"
+        execute "$START_RUNNER  >/dev/null 2>&1 & echo \$! >> $RUNNERS_PID"
       done
       echo "SUCCESS: Started $RUNNERS_NUM $DESC(s)."
     fi
