@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
-require_relative '../lib/setup'
+ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), ".."))
+
+require File.join(ROOT_PATH, 'lib', 'setup')
 
 GitlabCi::Setup.new
 exit

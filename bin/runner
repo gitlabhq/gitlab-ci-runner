@@ -2,7 +2,9 @@
 require 'rubygems'
 require 'bundler/setup'
 
-require_relative '../lib/runner'
+ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), ".."))
+
+require File.join(ROOT_PATH, 'lib', 'runner')
 
 GitlabCi::Runner.new
 exit
