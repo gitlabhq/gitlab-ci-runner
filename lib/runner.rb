@@ -1,5 +1,4 @@
-require_relative 'build'
-require_relative 'network'
+['build', 'network'].map{|file| require File.join(ROOT_PATH, 'lib', file)}
 
 module GitlabCi
   class Runner

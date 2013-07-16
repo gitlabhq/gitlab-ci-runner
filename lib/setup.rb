@@ -1,5 +1,5 @@
-require_relative 'config'
-require_relative 'network'
+['config', 'network'].map{|file| require File.join(ROOT_PATH, 'lib', file)}
+
 require 'yaml'
 
 module GitlabCi
