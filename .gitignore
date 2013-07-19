@@ -1,2 +1,5 @@
 config.yml
 tmp/*
+.gpairrc
+.ruby-version
+.ruby-gemset
