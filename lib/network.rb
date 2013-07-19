@@ -1,4 +1,4 @@
-require_relative 'config'
+require File.join(ROOT_PATH, 'lib', 'config')
 
 require 'httparty'
 require 'pry'
@@ -20,8 +20,8 @@ module GitlabCi
       broadcast 'Checking for builds...'
 
       opts = {
-        body: default_options.to_json,
-        headers: {"Content-Type" => "application/json"},
+        :body => default_options.to_json,
+        :headers => {"Content-Type" => "application/json"},
       }
 
       response = self.class.post(api_url + '/builds/register.json', opts)
@@ -29,12 +29,12 @@ module GitlabCi
       if response.code == 201
         puts 'received'
         {
-          id: response['id'],
-          project_id: response['project_id'],
-          commands: response['commands'].lines,
-          repo_url: response['repo_url'],
-          ref: response['sha'],
-          ref_name: response['ref'],
+          :id => response['id'],
+          :project_id => response['project_id'],
+          :commands => response['commands'].lines,
+          :repo_url => response['repo_url'],
+          :ref => response['sha'],
+          :ref_name => response['ref'],
         }
       elsif response.code == 403
         puts 'forbidden'
@@ -48,12 +48,12 @@ module GitlabCi
     def update_build(id, state, trace)
       broadcast "Submiting build #{id} to coordinator..."
 
-      options = default_options.merge(
-        state: state,
-        trace: trace,
-      )
+      options = default_options.merge({
+        :state => state,
+        :trace => trace,
+      })
 
-      response = self.class.put("#{api_url}/builds/#{id}.json", body: options)
+      response = self.class.put("#{api_url}/builds/#{id}.json", :body => options)
 
       if response.code == 200
         puts 'ok'
@@ -68,20 +68,20 @@ module GitlabCi
 
     def register_runner(public_key, token)
       body = {
-        public_key: public_key,
-        token: token
+        :public_key => public_key,
+        :token => token
       }
 
       opts = {
-        body: body.to_json,
-        headers: {"Content-Type" => "application/json"},
+        :body => body.to_json,
+        :headers => {"Content-Type" => "application/json"},
       }
 
       response = self.class.post(api_url + '/runners/register.json', opts)
 
       if response.code == 201
         {
-          token: response['token']
+          :token => response['token']
         }
       end
     end
@@ -106,7 +106,7 @@ module GitlabCi
 
     def default_options
       {
-        token: token
+        :token => token
       }
     end
   end

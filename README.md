@@ -6,6 +6,10 @@
 
 ## This is Runner repository. This code responsible for running tests
 
+### About this branch
+
+This branch is a compatibility branch for Ruby 1.8.7.
+
 ### Requirements
 
 **The project is designed for the Linux operating system.**

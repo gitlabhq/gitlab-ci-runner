@@ -37,7 +37,7 @@ GEM
     lumberjack (1.0.3)
     method_source (0.8.1)
     mime-types (1.23)
-    multi_json (1.7.4)
+    multi_json (1.6.1)
     multi_xml (0.5.3)
     pry (0.9.12.2)
       coderay (~> 1.0.5)
@@ -80,6 +80,7 @@ DEPENDENCIES
   guard-rspec
   httparty
   json (~> 1.7.7)
+  multi_json (~> 1.6.1)
   pry
   rspec
   vcr
