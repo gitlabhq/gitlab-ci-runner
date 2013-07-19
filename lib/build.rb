@@ -1,6 +1,7 @@
-require_relative 'encode'
-require_relative 'config'
-
+['encode', 'config'].map{|file| require File.join(ROOT_PATH, 'lib', file)}
+if RUBY_VERSION < "1.9.0"
+  require File.join(ROOT_PATH, 'lib', 'compatibility', 'file')
+end
 require 'childprocess'
 require 'tempfile'
 require 'fileutils'
@@ -79,8 +80,12 @@ module GitlabCi
       @output << cmd
       @output << "\n"
 
+
+      tempfile_params = ["child-output"]
+      tempfile_params << {:binmode => true} unless RUBY_VERSION < "1.9.0"
+      @tmp_file = Tempfile.new(*tempfile_params)
+
       @process = ChildProcess.build(cmd)
-      @tmp_file = Tempfile.new("child-output", binmode: true)
       @process.io.stdout = @tmp_file
       @process.io.stderr = @tmp_file
       @process.cwd = project_dir

@@ -1,6 +1,6 @@
 require 'yaml'
 
-ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), ".."))
+ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), "..")) unless defined?(:ROOT_PATH)
 
 module GitlabCi
   class Config

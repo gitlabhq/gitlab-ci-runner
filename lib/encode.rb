@@ -1,4 +1,7 @@
 require 'charlock_holmes/string'
+if RUBY_VERSION < "1.9.0"
+  require File.join(ROOT_PATH, 'lib', 'compatibility', 'string')
+end
 
 module GitlabCi
   module Encode
@@ -18,7 +21,7 @@ module GitlabCi
       # if message is not utf-8 encoding, convert it
       if detect[:encoding]
         message.force_encoding(detect[:encoding])
-        message.encode!("UTF-8", detect[:encoding], undef: :replace, replace: "", invalid: :replace)
+        message.encode!("UTF-8", detect[:encoding], :undef => :replace, :replace => "", :invalid => :replace)
       end
 
       # ensure message encoding is utf8
