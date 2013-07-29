@@ -46,7 +46,7 @@ module GitlabCi
     end
 
     def update_build(id, state, trace)
-      broadcast "Submiting build #{id} to coordinator..."
+      broadcast "Submitting build #{id} to coordinator..."
 
       options = default_options.merge(
         state: state,
