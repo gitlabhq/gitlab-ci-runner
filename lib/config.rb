@@ -22,6 +22,10 @@ module GitlabCi
       @config['url']
     end
 
+    def key_location
+      @config['key_location']
+    end
+
     def builds_dir
       @builds_path ||= File.join(ROOT_PATH, 'tmp', 'builds')
     end
