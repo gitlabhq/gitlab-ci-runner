@@ -26,6 +26,13 @@ git clone https://github.com/gitlabhq/gitlab-ci-runner.git
 cd gitlab-ci-runner
 
 # Install dependencies
+
+# a) Linux
+sudo apt-get install libicu-dev
+
+# b) MacOSx (make sure you have brew installed)
+sudo brew install icu4c
+
 gem install bundler
 bundle install
 
