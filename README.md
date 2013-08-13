@@ -41,3 +41,26 @@ ssh git@<your gitlab url>
 ```bash
 bundle exec ./bin/runner
 ```
+
+### Autostart Runners
+
+On linux machines you can have your runners operate like daemons with the following steps
+
+```
+# make sure you install any system dependancies first
+
+administrator@server:~$ sudo adduser --disabled-login --gecos 'GitLab CI Runner' gitlab_ci_runner
+administrator@server:~$ sudo su gitlab_ci_runner
+gitlab_ci_runner@server:/home/administrator$ cd ~/
+
+# perform the setup above
+
+gitlab_ci_runner@server:~$ exit;
+gitlab_ci_runner@server:/home/gitlab_ci_runner$ sudo cp ./gitlab-ci-runner/lib/support/init.d/gitlab_ci_runner /etc/init.d/gitlab-ci-runner
+gitlab_ci_runner@server:/home/gitlab_ci_runner$ cd ~
+administrator@server:~$ sudo chmod +x /etc/init.d/gitlab-ci-runner
+administrator@server:~$ sudo update-rc.d gitlab-ci-runner defaults 21 
+administrator@server:~$ sudo service gitlab-ci-runner start
+```
+
+
