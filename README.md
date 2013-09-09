@@ -18,6 +18,22 @@ We officially support (recent versions of) these Linux distributions:
 
 ### Installation
 
+First we need to compile ruby. Install dev packages:
+
+    sudo apt-get install -y wget curl gcc checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libreadline6-dev libc6-dev libssl-dev libmysql++-dev make build-essential zlib1g-dev openssh-server git-core libyaml-dev postfix libpq-dev libicu-dev
+
+
+Then download Ruby and compile it:
+
+    mkdir /tmp/ruby && cd /tmp/ruby
+    curl --progress http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p392.tar.gz | tar xz
+    cd ruby-1.9.3-p392
+    ./configure
+    make
+    sudo make install
+
+Now continue.
+
 ```bash
 # Get code
 git clone https://github.com/gitlabhq/gitlab-ci-runner.git
