@@ -3,3 +3,4 @@ tmp/*
 .gpairrc
 .ruby-version
 .ruby-gemset
+id_rsa*

@@ -1,10 +1,14 @@
 require_relative 'config'
 require_relative 'network'
+require_relative 'ssh_key_generator'
 require 'yaml'
 
 module GitlabCi
   class Setup
+    attr_reader :config
+
     def initialize
+      @config = Config.new
       build_config
       generate_ssh_key
       register_runner
@@ -15,18 +19,21 @@ module GitlabCi
     def build_config
       puts 'Please enter the gitlab-ci coordinator URL (e.g. http://gitlab-ci.org:3000/ )'
       url = gets.chomp
-
-      Config.new.write('url', url)
+      puts 'Please type where you would like the ssh key to be generated (Ex. ~/.ssh/id_rsa)'
+      key_location = gets.chomp
+      config.write('url', url)
+      config.write('key_location', key_location)
     end
 
     def generate_ssh_key
-      system('ssh-keygen -t rsa')
+      generator = GitlabCi::SshKeyGenerator.new(config)
+      generator.generate_key
     end
 
     def register_runner
       registered = false
 
-      public_key = File.read(File.expand_path('~/.ssh/id_rsa.pub'))
+      public_key = File.read(File.expand_path("#{config.key_location}.pub"))
 
       until registered
         puts 'Please enter the gitlab-ci token for this runner: '

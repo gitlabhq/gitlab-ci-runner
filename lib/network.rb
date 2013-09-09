@@ -1,7 +1,6 @@
 require_relative 'config'
 
 require 'httparty'
-require 'pry'
 require 'json'
 
 module GitlabCi
