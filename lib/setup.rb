@@ -36,7 +36,7 @@ module GitlabCi
           token = gets.chomp
         end
 
-        raise "Registering runner with public key: #{public_key[0..7]}, token: #{token}, url: Config.new.url."
+        raise "Registering runner with public key start: #{public_key[0..6]}, token: #{token}, url: #{Config.new.url}."
         runner = Network.new.register_runner(public_key, token)
 
         if runner
