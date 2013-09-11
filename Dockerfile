@@ -2,7 +2,6 @@
 
 FROM ubuntu:12.04
 MAINTAINER  Sytse Sijbrandij "sytse@gitlab.com"
-ORIGINAL    weisjohn "weis.john@gmail.com"
 
 # Update your packages and install the ones that are needed to compile Ruby
 
@@ -24,16 +23,8 @@ RUN cd /gitlab-ci-runner && gem install bundler && bundle install
 
 # Install the runner
 
-ENV HOME /root
-RUN cd /gitlab-ci-runner && bundle exec ./bin/install MY_GITLAB_URL MY_RUNNER_TOKEN
-
-# setup ssh (deprecated)
-## sub-optimal... it seems that ssh-keygen doesn't honor $HOME
-## mkdir for .ssh keys in the base director
-#  run         mkdir /.ssh
-## modify ssh config to use the appropriate key 
-#  run         echo "\nIdentityFile /.ssh/id_rsa" >> /etc/ssh/ssh_config
-
+# ENV HOME /root
+# RUN cd /gitlab-ci-runner && bundle exec ./bin/install MY_GITLAB_URL MY_RUNNER_TOKEN
 
 ## the default command to be run when this docker image is started
-cmd         /gitlab-ci-runner/bin/runner
+# cmd         /gitlab-ci-runner/bin/runner
