@@ -12,8 +12,7 @@ RUN apt-get install -y wget curl gcc libxml2-dev libxslt-dev libcurl4-openssl-de
 # Download Ruby and compile it
 
 RUN mkdir /tmp/ruby && cd /tmp/ruby
-RUN wget -O ruby-1.9.3-p392.tar.gz http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p392.tar.gz
-RUN tar -xzvf ruby-1.9.3-p392.tar.gz
+RUN curl --progress http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p392.tar.gz | tar xz
 RUN cd ruby-1.9.3-p392
 RUN ./configure
 RUN make
