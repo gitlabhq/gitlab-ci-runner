@@ -55,9 +55,13 @@ Install the gems for the runner:
     gem install bundler
     bundle install
 
-Install the runner in interactive mode:
+Install the runner in interactively:
 
     bundle exec ./bin/install
+
+Install the runner in non-interactively:
+
+    bundle exec ./bin/install YOUR_GITLAB_URL YOUR_RUNNER_TOKEN
 
 SSH into your GitLab server and confirm to add host key to known_hosts:
 

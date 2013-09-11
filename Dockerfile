@@ -25,7 +25,7 @@ RUN cd /gitlab-ci-runner && gem install bundler && bundle install
 # Install the runner
 
 ENV HOME /root
-RUN cd /gitlab-ci-runner && bundle exec ./bin/install
+RUN cd /gitlab-ci-runner && bundle exec ./bin/install MY_GITLAB_URL MY_RUNNER_TOKEN
 
 # setup ssh (deprecated)
 ## sub-optimal... it seems that ssh-keygen doesn't honor $HOME
