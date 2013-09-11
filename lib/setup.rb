@@ -4,17 +4,19 @@ require 'yaml'
 
 module GitlabCi
   class Setup
-    def initialize
-      build_config
+    def initialize(url, token)
+      build_config(url)
       generate_ssh_key
-      register_runner
+      register_runner(token)
     end
 
     private
 
-    def build_config
-      puts 'Please enter the gitlab-ci coordinator URL (e.g. http://gitlab-ci.org:3000/ )'
-      url = gets.chomp
+    def build_config(url)
+      unless url
+        puts 'Please enter the gitlab-ci coordinator URL (e.g. http://gitlab-ci.org:3000/ )'
+        url = gets.chomp
+      end
 
       Config.new.write('url', url)
     end
@@ -23,15 +25,18 @@ module GitlabCi
       system('ssh-keygen -t rsa -f $HOME/.ssh/id_rsa -N ""')
     end
 
-    def register_runner
+    def register_runner(token)
       registered = false
 
       public_key = File.read(File.expand_path('$HOME/.ssh/id_rsa.pub'))
 
       until registered
-        puts 'Please enter the gitlab-ci token for this runner: '
-        token = gets.chomp
+        unless token
+          puts 'Please enter the gitlab-ci token for this runner: '
+          token = gets.chomp
+        end
 
+        raise 'GOT THERE with #{public_key}, #{token}, config.url.'
         runner = Network.new.register_runner(public_key, token)
 
         if runner
