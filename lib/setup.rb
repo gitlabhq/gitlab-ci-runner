@@ -36,7 +36,7 @@ module GitlabCi
           token = gets.chomp
         end
 
-        raise 'GOT THERE with #{public_key}, #{token}, config.url.'
+        raise "GOT THERE with #{public_key}, #{token}, config.url."
         runner = Network.new.register_runner(public_key, token)
 
         if runner
