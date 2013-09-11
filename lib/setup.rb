@@ -20,13 +20,13 @@ module GitlabCi
     end
 
     def generate_ssh_key
-      system('ssh-keygen -t rsa')
+      system('ssh-keygen -t rsa -f $HOME/.ssh/id_rsa -N ""')
     end
 
     def register_runner
       registered = false
 
-      public_key = File.read(File.expand_path('~/.ssh/id_rsa.pub'))
+      public_key = File.read(File.expand_path('$HOME/.ssh/id_rsa.pub'))
 
       until registered
         puts 'Please enter the gitlab-ci token for this runner: '
