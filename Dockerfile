@@ -16,7 +16,7 @@ RUN cd /tmp/ruby/ruby-1.9.3-p392 && ./configure && make && make install
 
 # Install the runner
 
-RUN git clone https://github.com/gitlabhq/gitlab-ci-runner.git /gitlab-ci-runner
+RUN git clone https://github.com/dosire/gitlab-ci-runner.git /gitlab-ci-runner
 
 ## Install the gems for the runner
 
@@ -24,15 +24,15 @@ RUN cd /gitlab-ci-runner && gem install bundler && bundle install
 
 # Install the runner
 
+ENV HOME /root
 RUN cd /gitlab-ci-runner && bundle exec ./bin/install
 
-# setup ssh 
-
+# setup ssh (deprecated)
 ## sub-optimal... it seems that ssh-keygen doesn't honor $HOME
 ## mkdir for .ssh keys in the base director
-run         mkdir /.ssh
+#  run         mkdir /.ssh
 ## modify ssh config to use the appropriate key 
-run         echo "\nIdentityFile /.ssh/id_rsa" >> /etc/ssh/ssh_config
+#  run         echo "\nIdentityFile /.ssh/id_rsa" >> /etc/ssh/ssh_config
 
 
 ## the default command to be run when this docker image is started
