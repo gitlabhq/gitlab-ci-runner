@@ -18,46 +18,53 @@ We officially support (recent versions of) these Linux distributions:
 
 ### Installation
 
-First we need to compile ruby. Install dev packages:
+Update your packages and install the ones that are needed to compile Ruby:
 
-    sudo apt-get install -y wget curl gcc checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libreadline6-dev libc6-dev libssl-dev libmysql++-dev make build-essential zlib1g-dev openssh-server git-core libyaml-dev postfix libpq-dev libicu-dev
+    sudo apt-get update -y
 
+Install the dev packages that are needed for Ruby:
 
-Then download Ruby and compile it:
+    sudo apt-get install -y wget curl gcc checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libreadline6-dev libc6-dev libssl-dev libmysql++-dev make build-essential zlib1g-dev openssh-server git-core libyaml-dev postfix libpq-dev
 
-    mkdir /tmp/ruby && cd /tmp/ruby
+Download Ruby and compile it:
+
+    mkdir /tmp/ruby
+    cd /tmp/ruby
     curl --progress http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p392.tar.gz | tar xz
     cd ruby-1.9.3-p392
     ./configure
     make
     sudo make install
 
-Now continue.
+Install the runner:
 
-```bash
-# Get code
-git clone https://github.com/gitlabhq/gitlab-ci-runner.git
+    mkdir /tmp/runner
+    cd /tmp/ruby
+    git clone https://github.com/gitlabhq/gitlab-ci-runner.git
+    cd gitlab-ci-runner
 
-# Enter code dir
-cd gitlab-ci-runner
+Install operating system dependent dependencies:
 
-# Install dependencies
+a) Linux
 
-# a) Linux
-sudo apt-get install libicu-dev
+    sudo apt-get install libicu-dev
 
-# b) MacOSx (make sure you have brew installed)
-sudo brew install icu4c
+b) MacOSX (make sure you have [homebrew](http://brew.sh/) installed)
 
-gem install bundler
-bundle install
+    sudo brew install icu4c
 
-# Install runner in interactive mode
-bundle exec ./bin/install
+Install the gems for the runner:
 
-# SSH into your GitLab server and confirm to add host key to known_hosts
-ssh git@<your gitlab url>
-```
+    gem install bundler
+    bundle install
+
+Install the runner in interactive mode:
+
+    bundle exec ./bin/install
+
+SSH into your GitLab server and confirm to add host key to known_hosts:
+
+    ssh git@<your gitlab url>
 
 ### Run
 
