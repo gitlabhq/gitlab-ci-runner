@@ -32,13 +32,13 @@ module GitlabCi
       public_key = File.read(File.expand_path('~/.ssh/id_rsa.pub'))
 
       until registered
-        token = ENV['RUNNER_TOKEN']
+        token = ENV['REGISTRATION_TOKEN']
         unless token
           puts 'Please enter the gitlab-ci token for this runner: '
           token = gets.chomp
         end
 
-        puts "Registering runner with public key type: #{public_key[0..6]}, token: #{token}, url: #{Config.new.url}."
+        puts "Registering runner with public key type: #{public_key[0..6]}, registration token: #{token}, url: #{Config.new.url}."
         runner = Network.new.register_runner(public_key, token)
 
         if runner
