@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 require_relative '../lib/setup'
 
-url, token = ARGV
-GitlabCi::Setup.new(url, token)
+GitlabCi::Setup.new
 exit
