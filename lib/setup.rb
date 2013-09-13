@@ -4,15 +4,16 @@ require 'yaml'
 
 module GitlabCi
   class Setup
-    def initialize(url, token)
-      build_config(url)
+    def initialize
+      build_config
       generate_ssh_key
-      register_runner(token)
+      register_runner
     end
 
     private
 
-    def build_config(url)
+    def build_config
+      url = ENV['GITLAB_CI_URL']
       unless url
         puts 'Please enter the gitlab-ci coordinator URL (e.g. http://gitlab-ci.org:3000/ )'
         url = gets.chomp
@@ -22,21 +23,24 @@ module GitlabCi
     end
 
     def generate_ssh_key
-      system('ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""')
+      ENV['HOME'] = '/root' if '/' == ENV['HOME'] # Don't store them in //.ssh
+      system('ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""') # Create a key without a password.
     end
 
-    def register_runner(token)
+    def register_runner
       registered = false
 
+      ENV['HOME'] = '/root' if '/' == ENV['HOME'] # Don't store them in //.ssh
       public_key = File.read(File.expand_path('~/.ssh/id_rsa.pub'))
 
       until registered
+        token = ENV['RUNNER_TOKEN']
         unless token
           puts 'Please enter the gitlab-ci token for this runner: '
           token = gets.chomp
         end
 
-        raise "Registering runner with public key start: #{public_key[0..6]}, token: #{token}, url: #{Config.new.url}."
+        puts "Registering runner with public key type: #{public_key[0..6]}, token: #{token}, url: #{Config.new.url}."
         runner = Network.new.register_runner(public_key, token)
 
         if runner
