@@ -32,8 +32,8 @@ RUN git clone https://github.com/dosire/gitlab-ci-runner.git /gitlab-ci-runner
 RUN cd /gitlab-ci-runner && gem install bundler && bundle install
 
 # Add the remote server key for non-interactive ssh connections
-RUN mkdir ~/.ssh
-RUN ssh-keyscan -H $GITLAB_SERVER_FQDN >> ~/.ssh/known_hosts
+RUN mkdir -p $HOME/.ssh
+RUN ssh-keyscan -H $GITLAB_SERVER_FQDN >> $HOME/.ssh/known_hosts
 
 # When the image is started unstall the runner and run it.
 WORKDIR /gitlab-ci-runner
