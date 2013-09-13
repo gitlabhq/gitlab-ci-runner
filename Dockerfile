@@ -26,4 +26,5 @@ RUN git clone https://github.com/dosire/gitlab-ci-runner.git /gitlab-ci-runner
 RUN cd /gitlab-ci-runner && gem install bundler && bundle install
 
 # When the image is started unstall the runner and run it.
-CMD cd /gitlab-ci-runner && bundle exec ./bin/install_and_run
+WORKDIR /gitlab-ci-runner
+CMD bundle exec ./bin/install_and_run
