@@ -33,6 +33,7 @@ RUN cd /gitlab-ci-runner && gem install bundler && bundle install
 
 # Add the remote server key for non-interactive ssh connections
 RUN mkdir -p $HOME/.ssh
+RUN touch $HOME/.ssh/known_hosts
 RUN ssh-keyscan -H $GITLAB_SERVER_FQDN >> $HOME/.ssh/known_hosts
 
 # When the image is started unstall the runner and run it.
