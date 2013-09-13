@@ -4,7 +4,7 @@
 
 ![Screen](https://github.com/downloads/gitlabhq/gitlab-ci/gitlab_ci_preview.png)
 
-## This is Runner repository. This code will only run tests. For more information and the test coordinator please see the gitlab-ci repo.
+## This is Runner repository. This code will only run tests. For more information and the test coordinator please see the [gitlab-ci repo](https://github.com/gitlabhq/gitlab-ci).
 
 ### Requirements
 
@@ -15,15 +15,22 @@ We officially support (recent versions of) these Linux distributions:
 - Ubuntu Linux
 - Debian/GNU Linux
 
-
 ### Installation
 
-Update your packages and install the ones that are needed to compile Ruby:
+Install operating system dependent dependencies:
+
+a) Linux
 
     sudo apt-get update -y
-    sudo apt-get install -y wget curl gcc libxml2-dev libxslt-dev libcurl4-openssl-dev libreadline6-dev libc6-dev libssl-dev make build-essential zlib1g-dev openssh-server git-core libyaml-dev postfix libpq-dev
+    sudo apt-get install -y wget curl gcc libxml2-dev libxslt-dev libcurl4-openssl-dev libreadline6-dev libc6-dev libssl-dev make build-essential zlib1g-dev openssh-server git-core libyaml-dev postfix libpq-dev libicu-dev
 
-Download Ruby and compile it:
+b) MacOSX (make sure you have [homebrew](http://brew.sh/) installed)
+
+    sudo brew install icu4c
+
+Install Ruby from source:
+
+a) Linux
 
     mkdir /tmp/ruby
     cd /tmp/ruby
@@ -33,6 +40,16 @@ Download Ruby and compile it:
     make
     sudo make install
 
+b) MacOSX (make sure you have the Xcode command line tools installed), UNTESTED
+
+    brew update
+    brew install rbenv
+    brew install ruby-build
+    brew install openssl
+    CC=gcc-4.7 RUBY_CONFIGURE_OPTS="--with-openssl-dir=`brew --prefix openssl` --with-readline-dir=`brew --prefix readline` --with-gcc=gcc-4.7 --enable-shared" rbenv install 1.9.3-p392
+    echo 'if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi' >> ~/.profile
+    rbenv global 1.9.3-p194
+
 Install the runner:
 
     mkdir /tmp/runner
@@ -40,28 +57,18 @@ Install the runner:
     git clone https://github.com/gitlabhq/gitlab-ci-runner.git
     cd gitlab-ci-runner
 
-Install operating system dependent dependencies:
-
-a) Linux
-
-    sudo apt-get install libicu-dev
-
-b) MacOSX (make sure you have [homebrew](http://brew.sh/) installed)
-
-    sudo brew install icu4c
-
 Install the gems for the runner:
 
     gem install bundler
     bundle install
 
-Install the runner in interactively:
+Install the runner interactively:
 
     bundle exec ./bin/install
 
-Install the runner in non-interactively:
+Install the runner non-interactively:
 
-    bundle exec ./bin/install YOUR_GITLAB_URL YOUR_RUNNER_TOKEN
+    CI_SERVER_URL=https://ci.example.com REGISTRATION_TOKEN=replaceme bundle exec ./bin/install
 
 SSH into your GitLab server and confirm to add host key to known_hosts:
 
@@ -75,7 +82,7 @@ bundle exec ./bin/runner
 
 ### Autostart Runners
 
-On linux machines you can have your runners operate like daemons with the following steps
+On Linux machines you can have your runners operate like daemons with the following steps
 
 ```
 # make sure you install any system dependancies first
