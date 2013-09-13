@@ -23,14 +23,12 @@ module GitlabCi
     end
 
     def generate_ssh_key
-      ENV['HOME'] = '/root' if '/' == ENV['HOME'] # Don't store keys in //.ssh
       system('ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""') # Create a key without a password.
     end
 
     def register_runner
       registered = false
 
-      ENV['HOME'] = '/root' if '/' == ENV['HOME'] # Don't store keys in //.ssh
       public_key = File.read(File.expand_path('~/.ssh/id_rsa.pub'))
 
       until registered
