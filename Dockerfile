@@ -9,7 +9,7 @@ MAINTAINER  Sytse Sijbrandij "sytse@gitlab.com"
 # docker build -t dosire/gitlab-ci-runner github.com/dosire/gitlab-ci-runner
 #
 # Then set the environment variables and run the gitlab-ci-runner in the container:
-# docker run -e CI_SERVER_URL=https://ci.example.com -e REGISTRATION_TOKEN=replaceme -e HOME=/root dosire/gitlab-ci-runner
+# docker run -e CI_SERVER_URL=https://ci.example.com -e REGISTRATION_TOKEN=replaceme -e HOME=/root -e GITLAB_SERVER_FQDN=gitlab.example.com dosire/gitlab-ci-runner
 #
 # If you want a terminal in the container to troubleshoot something please look up the image id with:
 # docker images
@@ -28,8 +28,11 @@ RUN cd /tmp/ruby/ruby-1.9.3-p392 && ./configure && make && make install
 # Install the runner
 RUN git clone https://github.com/dosire/gitlab-ci-runner.git /gitlab-ci-runner
 
-## Install the gems for the runner
+# Install the gems for the runner
 RUN cd /gitlab-ci-runner && gem install bundler && bundle install
+
+# Add the remote server key for non-interactive ssh connections
+RUN ssh-keyscan -H $GITLAB_SERVER_FQDN >> ~/.ssh/known_hosts
 
 # When the image is started unstall the runner and run it.
 WORKDIR /gitlab-ci-runner
