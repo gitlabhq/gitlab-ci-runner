@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'bundler/setup'
+
+require_relative '../lib/setup'
+require_relative '../lib/runner'
+
+GitlabCi::Setup.new
+GitlabCi::Runner.new
+exit
