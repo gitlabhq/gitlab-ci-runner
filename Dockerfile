@@ -25,8 +25,8 @@ RUN apt-get install -y wget curl gcc libxml2-dev libxslt-dev libcurl4-openssl-de
 RUN mkdir /tmp/ruby && cd /tmp/ruby && curl --progress http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p392.tar.gz | tar xz
 RUN cd /tmp/ruby/ruby-1.9.3-p392 && ./configure && make && make install
 
-# Install packages commonly required to run rails projects:
-RUN apt-get install -y libqtwebkit-dev
+# Install packages commonly required to test Rails projects:
+RUN apt-get install -y libqtwebkit-dev # test with capybara
 
 # Install the runner
 RUN git clone https://github.com/dosire/gitlab-ci-runner.git /gitlab-ci-runner
