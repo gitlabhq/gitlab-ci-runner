@@ -5,6 +5,9 @@ require 'bundler/setup'
 require_relative '../lib/setup'
 require_relative '../lib/runner'
 
+puts 'Setup starting.'
 GitlabCi::Setup.new
+puts 'Setup finished. Runner starting.'
 GitlabCi::Runner.new
+puts 'Runner finished.'
 exit
