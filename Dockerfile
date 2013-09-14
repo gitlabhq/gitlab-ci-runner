@@ -27,6 +27,7 @@ RUN cd /tmp/ruby/ruby-1.9.3-p392 && ./configure && make && make install
 
 # Install packages commonly required to test Rails projects:
 RUN apt-get install -y libqtwebkit-dev # test with capybara
+RUN apt-get install -y libmysqlclient-dev # native extensions for the mysql2 gem
 
 # Install the runner
 RUN git clone https://github.com/dosire/gitlab-ci-runner.git /gitlab-ci-runner
