@@ -38,6 +38,7 @@ RUN ln -s /bin/true /sbin/initctl
 # Install packages commonly required to test Rails projects before the test run starts
 # If they are not here you have to add them to the test script in the project settings
 RUN apt-get install -y libqtwebkit-dev # test with capybara
+RUN apt-get install -y sqlite3 libsqlite3-dev # sqlite is the default datastore
 RUN apt-get install -y libmysqlclient-dev # native extensions for the mysql2 gem
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y mysql-server # install MySQL with blank root password
 
