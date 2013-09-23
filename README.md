@@ -15,6 +15,8 @@ We officially support (recent versions of) these Linux distributions:
 - Ubuntu Linux
 - Debian/GNU Linux
 
+To run GitLab CI we recommend using GitLab 6.0 or higher, for LDAP login this is required.
+
 ### Installation
 
 Install operating system dependent dependencies:
