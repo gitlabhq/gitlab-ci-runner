@@ -11,11 +11,14 @@ MAINTAINER  Sytse Sijbrandij "sytse@gitlab.com"
 # Then set the environment variables and run the gitlab-ci-runner in the container:
 # docker run -e CI_SERVER_URL=https://ci.example.com -e REGISTRATION_TOKEN=replaceme -e HOME=/root -e GITLAB_SERVER_FQDN=gitlab.example.com dosire/gitlab-ci-runner
 #
-# If you want a terminal in the container to troubleshoot something please look up the image id with:
-# docker images
+# After you start the runner you can send it to the background with ctrl-z
+# The new unner should show up in the GitLab CI interface on /runners
 #
-# And start an interactive session with:
-# docker run -e CI_SERVER_URL=https://ci.example.com -e REGISTRATION_TOKEN=replaceme -e HOME=/root -i -t IMAGE_ID /bin/bash
+# You can tart an interactive session to test new commands with:
+# docker run -e CI_SERVER_URL=https://ci.example.com -e REGISTRATION_TOKEN=replaceme -e HOME=/root -i -t dosire/gitlab-ci-runner:latest /bin/bash
+#
+# If you ever want to freshly rebuild the runner please use:
+# docker build -no-cache -t dosire/gitlab-ci-runner github.com/dosire/gitlab-ci-runner
 
 # Update your packages and install the ones that are needed to compile Ruby
 RUN apt-get update -y
