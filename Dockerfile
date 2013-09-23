@@ -41,6 +41,7 @@ RUN apt-get install -y libqtwebkit-dev # test with capybara
 RUN apt-get install -y sqlite3 libsqlite3-dev # sqlite is the default datastore
 RUN apt-get install -y libmysqlclient-dev # native extensions for the mysql2 gem
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y mysql-server # install MySQL with blank root password
+RUN apt-get install -y postgresql # Make sure postgres is running
 RUN cd /root && wget http://download.redis.io/redis-stable.tar.gz && tar xvzf redis-stable.tar.gz && cd redis-stable && make
 
 # Prepare a known host file for non-interactive ssh connections
