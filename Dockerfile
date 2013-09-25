@@ -6,19 +6,19 @@ MAINTAINER  Sytse Sijbrandij "sytse@gitlab.com"
 # This script will start a runner in a docker container.
 #
 # First build the container and give a name to the resulting image:
-# docker build -t dosire/gitlab-ci-runner github.com/dosire/gitlab-ci-runner
+# docker build -t gitlabhq/gitlab-ci-runner github.com/gitlabhq/gitlab-ci-runner
 #
 # Then set the environment variables and run the gitlab-ci-runner in the container:
-# docker run -e CI_SERVER_URL=https://ci.example.com -e REGISTRATION_TOKEN=replaceme -e HOME=/root -e GITLAB_SERVER_FQDN=gitlab.example.com dosire/gitlab-ci-runner
+# docker run -e CI_SERVER_URL=https://ci.example.com -e REGISTRATION_TOKEN=replaceme -e HOME=/root -e GITLAB_SERVER_FQDN=gitlab.example.com gitlabhq/gitlab-ci-runner
 #
 # After you start the runner you can send it to the background with ctrl-z
 # The new unner should show up in the GitLab CI interface on /runners
 #
 # You can tart an interactive session to test new commands with:
-# docker run -e CI_SERVER_URL=https://ci.example.com -e REGISTRATION_TOKEN=replaceme -e HOME=/root -i -t dosire/gitlab-ci-runner:latest /bin/bash
+# docker run -e CI_SERVER_URL=https://ci.example.com -e REGISTRATION_TOKEN=replaceme -e HOME=/root -i -t gitlabhq/gitlab-ci-runner:latest /bin/bash
 #
 # If you ever want to freshly rebuild the runner please use:
-# docker build -no-cache -t dosire/gitlab-ci-runner github.com/dosire/gitlab-ci-runner
+# docker build -no-cache -t gitlabhq/gitlab-ci-runner github.com/gitlabhq/gitlab-ci-runner
 
 # Update your packages and install the ones that are needed to compile Ruby
 RUN apt-get update -y
@@ -29,7 +29,7 @@ RUN mkdir /tmp/ruby && cd /tmp/ruby && curl --progress http://ftp.ruby-lang.org/
 RUN cd /tmp/ruby/ruby-1.9.3-p392 && ./configure && make && make install
 
 # Install the runner
-RUN git clone https://github.com/dosire/gitlab-ci-runner.git /gitlab-ci-runner
+RUN git clone https://github.com/gitlabhq/gitlab-ci-runner.git /gitlab-ci-runner
 
 # Install the gems for the runner
 RUN cd /gitlab-ci-runner && gem install bundler && bundle install
