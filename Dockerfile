@@ -28,12 +28,6 @@ RUN apt-get install -y wget curl gcc libxml2-dev libxslt-dev libcurl4-openssl-de
 RUN mkdir /tmp/ruby && cd /tmp/ruby && curl --progress http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p392.tar.gz | tar xz
 RUN cd /tmp/ruby/ruby-1.9.3-p392 && ./configure && make && make install
 
-# Install the runner
-RUN git clone https://github.com/gitlabhq/gitlab-ci-runner.git /gitlab-ci-runner
-
-# Install the gems for the runner
-RUN cd /gitlab-ci-runner && gem install bundler && bundle install
-
 # Fix upstart under a virtual host https://github.com/dotcloud/docker/issues/1024
 RUN dpkg-divert --local --rename --add /sbin/initctl
 RUN ln -s /bin/true /sbin/initctl
@@ -58,6 +52,12 @@ RUN /etc/init.d/postgresql start && su postgres -c "psql -c \"create user root;\
 # Prepare a known host file for non-interactive ssh connections
 RUN mkdir -p /root/.ssh
 RUN touch /root/.ssh/known_hosts
+
+# Install the runner
+RUN git clone https://github.com/gitlabhq/gitlab-ci-runner.git /gitlab-ci-runner
+
+# Install the gems for the runner
+RUN cd /gitlab-ci-runner && gem install bundler && bundle install
 
 # When the image is started add the remote server key, unstall the runner and run it
 WORKDIR /gitlab-ci-runner
