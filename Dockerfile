@@ -46,7 +46,7 @@ RUN locale-gen en_US.UTF-8
 RUN update-locale LANG=en_US.UTF-8
 
 # Install PostgreSQL, after install this should work: psql --host=127.0.0.1 roottestdb
-RUN apt-get install -y postgresql # Make sure postgres is running
+RUN apt-get install -y postgresql
 RUN cat /dev/null > /etc/postgresql/9.1/main/pg_hba.conf
 RUN echo "# TYPE DATABASE USER ADDRESS METHOD" >> /etc/postgresql/9.1/main/pg_hba.conf
 RUN echo "local  all  all  trust" >> /etc/postgresql/9.1/main/pg_hba.conf
