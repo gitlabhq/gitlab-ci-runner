@@ -13,14 +13,17 @@ module GitlabCi
     private
 
     def build_config
-      puts 'Please enter the gitlab-ci coordinator URL (e.g. http://gitlab-ci.org:3000/ )'
-      url = gets.chomp
+      url = ENV['CI_SERVER_URL']
+      unless url
+        puts 'Please enter the gitlab-ci coordinator URL (e.g. http://gitlab-ci.org:3000/ )'
+        url = gets.chomp
+      end
 
       Config.new.write('url', url)
     end
 
     def generate_ssh_key
-      system('ssh-keygen -t rsa')
+      system('ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""') # Create a key without a password.
     end
 
     def register_runner
@@ -29,9 +32,13 @@ module GitlabCi
       public_key = File.read(File.expand_path('~/.ssh/id_rsa.pub'))
 
       until registered
-        puts 'Please enter the gitlab-ci token for this runner: '
-        token = gets.chomp
+        token = ENV['REGISTRATION_TOKEN']
+        unless token
+          puts 'Please enter the gitlab-ci token for this runner: '
+          token = gets.chomp
+        end
 
+        puts "Registering runner with public key type: #{public_key[0..6]}, registration token: #{token}, url: #{Config.new.url}."
         runner = Network.new.register_runner(public_key, token)
 
         if runner
