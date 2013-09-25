@@ -40,6 +40,11 @@ RUN apt-get install -y libmysqlclient-dev # native extensions for the mysql2 gem
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y mysql-server # install MySQL with blank root password
 RUN cd /root && wget http://download.redis.io/redis-stable.tar.gz && tar xvzf redis-stable.tar.gz && cd redis-stable && make
 
+# Set the right locale for Postgres
+echo "LC_ALL=\"en_US.UTF-8\"" >> /etc/default/locale
+locale-gen en_US.UTF-8
+update-locale LANG=en_US.UTF-8
+
 # Install PostgreSQL, after install this should work: psql --host=127.0.0.1 roottestdb
 RUN apt-get install -y postgresql # Make sure postgres is running
 RUN cat /dev/null > /etc/postgresql/9.1/main/pg_hba.conf
