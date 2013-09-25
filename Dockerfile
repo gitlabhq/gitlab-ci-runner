@@ -61,4 +61,4 @@ RUN touch /root/.ssh/known_hosts
 
 # When the image is started add the remote server key, unstall the runner and run it
 WORKDIR /gitlab-ci-runner
-CMD ssh-keyscan -H $GITLAB_SERVER_FQDN >> /root/.ssh/known_hosts && mysqld & /root/src/redis-server & bundle exec ./bin/install_and_run
+CMD ssh-keyscan -H $GITLAB_SERVER_FQDN >> /root/.ssh/known_hosts && mysqld & /root/src/redis-server & /etc/init.d/postgresql start & bundle exec ./bin/install_and_run
