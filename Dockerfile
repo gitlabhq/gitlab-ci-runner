@@ -44,8 +44,19 @@ RUN apt-get install -y libqtwebkit-dev # test with capybara
 RUN apt-get install -y sqlite3 libsqlite3-dev # sqlite is the default datastore
 RUN apt-get install -y libmysqlclient-dev # native extensions for the mysql2 gem
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y mysql-server # install MySQL with blank root password
-RUN apt-get install -y postgresql # Make sure postgres is running
 RUN cd /root && wget http://download.redis.io/redis-stable.tar.gz && tar xvzf redis-stable.tar.gz && cd redis-stable && make
+
+# Install PostgreSQL, after install this should work: psql --host=127.0.0.1 roottestdb
+RUN apt-get install -y postgresql # Make sure postgres is running
+RUN cat /dev/null > /etc/postgresql/9.1/main/pg_hba.conf
+RUN echo "# TYPE DATABASE USER ADDRESS METHOD" >> /etc/postgresql/9.1/main/pg_hba.conf
+RUN echo "local  all  all  trust" >> /etc/postgresql/9.1/main/pg_hba.conf
+RUN echo "host all all 127.0.0.1/32 trust" >> /etc/postgresql/9.1/main/pg_hba.conf
+RUN echo "host all all  ::1/128 trust" >> /etc/postgresql/9.1/main/pg_hba.conf
+RUN /etc/init.d/postgresql start
+RUN su postgres -c "psql -c \"create user root;\""
+RUN su postgres -c "psql -c \"alter user root createdb;\""
+RUN su postgres -c "psql -c \"create database roottestdb owner root;\""
 
 # Prepare a known host file for non-interactive ssh connections
 RUN mkdir -p /root/.ssh
