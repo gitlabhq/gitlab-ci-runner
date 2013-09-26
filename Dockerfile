@@ -59,7 +59,7 @@ RUN mkdir -p /root/.ssh
 RUN touch /root/.ssh/known_hosts
 
 # Install the runner
-RUN git clone https://github.com/dosire/gitlab-ci-runner.git /gitlab-ci-runner
+RUN git clone https://github.com/gitlabhq/gitlab-ci-runner.git /gitlab-ci-runner
 
 # Install the gems for the runner
 RUN cd /gitlab-ci-runner && gem install bundler && bundle install
