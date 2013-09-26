@@ -8,12 +8,16 @@
 
 ### Requirements
 
-**The project is designed for the Linux operating system.**
+**This project is designed for the Linux operating system.**
 
 We officially support (recent versions of) these Linux distributions:
 
 - Ubuntu Linux
 - Debian/GNU Linux
+
+Mac OSX and other POSIX operating systems are not supported but will work with adaptations.
+
+Under Windows the runner will only work under POSIX compliant environments like Cygwin.
 
 To run GitLab CI we recommend using GitLab 6.0 or higher, for LDAP login this is required.
 
