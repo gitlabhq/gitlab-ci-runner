@@ -59,7 +59,7 @@ b) MacOSX (make sure you have the Xcode command line tools installed), UNTESTED
 Install the runner:
 
     mkdir /tmp/runner
-    cd /tmp/ruby
+    cd /tmp/runner
     git clone https://github.com/gitlabhq/gitlab-ci-runner.git
     cd gitlab-ci-runner
 
