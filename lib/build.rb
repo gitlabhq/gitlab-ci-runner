@@ -9,7 +9,7 @@ module GitlabCi
   class Build
     TIMEOUT = 7200
 
-    attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :state
+    attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :state, :before_sha
 
     def initialize(data)
       @commands = data[:commands].to_a
@@ -19,6 +19,7 @@ module GitlabCi
       @project_id = data[:project_id]
       @repo_url = data[:repo_url]
       @state = :waiting
+      @before_sha = data[:before_sha]
     end
 
     def run
@@ -96,6 +97,7 @@ module GitlabCi
       @process.environment['CI_SERVER_REVISION'] = nil# GitlabCi::Revision
 
       @process.environment['CI_BUILD_REF'] = @ref
+      @process.environment['CI_BUILD_BEFORE_SHA'] = @before_sha
       @process.environment['CI_BUILD_REF_NAME'] = @ref_name
       @process.environment['CI_BUILD_ID'] = @id
 
