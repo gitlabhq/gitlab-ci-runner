@@ -19,7 +19,7 @@ module GitlabCi
       @project_id = data[:project_id]
       @repo_url = data[:repo_url]
       @state = :waiting
-      @before_ref = data[:before_sha]
+      @before_sha = data[:before_sha]
     end
 
     def run
