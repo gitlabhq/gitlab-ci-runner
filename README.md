@@ -58,8 +58,9 @@ b) MacOSX (make sure you have the Xcode command line tools installed), UNTESTED
 
 Install the runner:
 
-    mkdir /tmp/runner
-    cd /tmp/runner
+    # Use any directory you like
+    mkdir ~/gitlab-runners
+    cd ~/gitlab-runners
     git clone https://github.com/gitlabhq/gitlab-ci-runner.git
     cd gitlab-ci-runner
 
