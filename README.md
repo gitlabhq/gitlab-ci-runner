@@ -56,7 +56,7 @@ b) MacOSX (make sure you have the Xcode command line tools installed), UNTESTED
     echo 'if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi' >> ~/.profile
     rbenv global 1.9.3-p194
 
-Install the runner:
+Download the code for the runner:
 
     # Use any directory you like
     mkdir ~/gitlab-runners
@@ -69,13 +69,13 @@ Install the gems for the runner:
     gem install bundler
     bundle install
 
-Install the runner interactively:
+Setup the runner interactively:
 
-    bundle exec ./bin/install
+    bundle exec ./bin/setup
 
-Install the runner non-interactively:
+Setup the runner non-interactively:
 
-    CI_SERVER_URL=https://ci.example.com REGISTRATION_TOKEN=replaceme bundle exec ./bin/install
+    CI_SERVER_URL=https://ci.example.com REGISTRATION_TOKEN=replaceme bundle exec ./bin/setup
 
 SSH into your GitLab server and confirm to add host key to known_hosts:
 
