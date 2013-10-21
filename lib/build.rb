@@ -148,7 +148,7 @@ module GitlabCi
       cmd = []
       cmd << "cd #{project_dir}"
       cmd << "git reset --hard"
-      cmd << "git clean -f"
+      cmd << "git clean -fx"
       cmd << "git fetch"
       cmd.join(" && ")
     end
