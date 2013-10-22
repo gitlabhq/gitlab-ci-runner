@@ -20,6 +20,7 @@ module GitlabCi
       @repo_url = data[:repo_url]
       @state = :waiting
       @before_sha = data[:before_sha]
+      @project_name = data[:project_name]
     end
 
     def run
@@ -100,7 +101,7 @@ module GitlabCi
       @process.environment['CI_BUILD_BEFORE_SHA'] = @before_sha
       @process.environment['CI_BUILD_REF_NAME'] = @ref_name
       @process.environment['CI_BUILD_ID'] = @id
-
+      @process.environment['CI_BUILD_PROJECT_NAME'] = @project_name
       @process.start
 
       @tmp_file_path = @tmp_file.path
@@ -138,7 +139,7 @@ module GitlabCi
     def clone_cmd
       cmd = []
       cmd << "cd #{config.builds_dir}"
-      cmd << "git clone #{@repo_url} project-#{@project_id}"
+      cmd << "git clone #{@repo_url} #{project_dir}"
       cmd << "cd project-#{@project_id}"
       cmd << "git checkout #{@ref_name}"
       cmd.join(" && ")
@@ -162,7 +163,7 @@ module GitlabCi
     end
 
     def project_dir
-      File.join(config.builds_dir, "project-#{@project_id}")
+      File.join(config.builds_dir, "project-#{@project_id}/#{@project_name}")
     end
   end
 end
