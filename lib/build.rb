@@ -20,6 +20,8 @@ module GitlabCi
       @repo_url = data[:repo_url]
       @state = :waiting
       @before_sha = data[:before_sha]
+      @timeout = data[:timeout] || TIMEOUT
+      @allow_git_fetch = data[:allow_git_fetch]
     end
 
     def run
@@ -27,9 +29,10 @@ module GitlabCi
 
       @commands.unshift(checkout_cmd)
 
-      if repo_exists?
+      if repo_exists? && @allow_git_fetch
         @commands.unshift(fetch_cmd)
       else
+        FileUtils.rm_rf(project_dir)
         FileUtils.mkdir_p(project_dir)
         @commands.unshift(clone_cmd)
       end
@@ -106,7 +109,7 @@ module GitlabCi
       @tmp_file_path = @tmp_file.path
 
       begin
-        @process.poll_for_exit(TIMEOUT)
+        @process.poll_for_exit(@timeout)
       rescue ChildProcess::TimeoutError
         @output << "TIMEOUT"
         @process.stop # tries increasingly harsher methods to kill the process.
@@ -148,7 +151,7 @@ module GitlabCi
       cmd = []
       cmd << "cd #{project_dir}"
       cmd << "git reset --hard"
-      cmd << "git clean -fx"
+      cmd << "git clean -fdx"
       cmd << "git fetch"
       cmd.join(" && ")
     end
