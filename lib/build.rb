@@ -4,7 +4,6 @@ require_relative 'config'
 require 'childprocess'
 require 'tempfile'
 require 'fileutils'
-#require 'logger'
 
 
 module GitlabCi
@@ -14,8 +13,6 @@ module GitlabCi
     attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :state, :before_sha
 
     def initialize(data)
- #     log = Logger.new('log.txt')
- #    log.info "Data name is #{data}"
       @commands = data[:commands].to_a
       @ref = data[:ref]
       @ref_name = data[:ref_name]
