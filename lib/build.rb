@@ -4,6 +4,8 @@ require_relative 'config'
 require 'childprocess'
 require 'tempfile'
 require 'fileutils'
+#require 'logger'
+
 
 module GitlabCi
   class Build
@@ -12,6 +14,8 @@ module GitlabCi
     attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :state, :before_sha
 
     def initialize(data)
+ #     log = Logger.new('log.txt')
+ #    log.info "Data name is #{data}"
       @commands = data[:commands].to_a
       @ref = data[:ref]
       @ref_name = data[:ref_name]
@@ -102,6 +106,9 @@ module GitlabCi
       @process.environment['CI_BUILD_REF_NAME'] = @ref_name
       @process.environment['CI_BUILD_ID'] = @id
       @process.environment['CI_BUILD_PROJECT_NAME'] = @project_name
+      @process.environment['CI_BUILD_DIR'] = config.builds_dir
+      @process.environment['CI_BUILD_PROJECT_DIR'] = project_dir
+      
       @process.start
 
       @tmp_file_path = @tmp_file.path
@@ -130,7 +137,7 @@ module GitlabCi
 
     def checkout_cmd
       cmd = []
-      cmd << "cd #{project_dir}"
+      cmd << "cd #{project_dir}/#{@project_name}"
       cmd << "git reset --hard"
       cmd << "git checkout #{@ref}"
       cmd.join(" && ")
@@ -139,15 +146,15 @@ module GitlabCi
     def clone_cmd
       cmd = []
       cmd << "cd #{config.builds_dir}"
-      cmd << "git clone #{@repo_url} #{project_dir}"
-      cmd << "cd project-#{@project_id}"
+      cmd << "git clone #{@repo_url} #{project_dir}/#{@project_name}"
+      cmd << "cd #{project_dir}/#{@project_name}"
       cmd << "git checkout #{@ref_name}"
       cmd.join(" && ")
     end
 
     def fetch_cmd
       cmd = []
-      cmd << "cd #{project_dir}"
+      cmd << "cd #{project_dir}/#{@project_name}"
       cmd << "git reset --hard"
       cmd << "git clean -f"
       cmd << "git fetch"
@@ -155,7 +162,7 @@ module GitlabCi
     end
 
     def repo_exists?
-      File.exists?(File.join(project_dir, '.git'))
+      File.exists?(File.join("#{project_dir}/#{@project_name}", '.git'))
     end
 
     def config
@@ -163,7 +170,7 @@ module GitlabCi
     end
 
     def project_dir
-      File.join(config.builds_dir, "project-#{@project_id}/#{@project_name}")
+      File.join(config.builds_dir, "project-#{@project_id}")
     end
   end
 end
