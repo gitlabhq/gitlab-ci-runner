@@ -101,6 +101,9 @@ module GitlabCi
       @process.environment['CI_BUILD_REF_NAME'] = @ref_name
       @process.environment['CI_BUILD_ID'] = @id
 
+      @process.environment['CI_PROJECT_REPO_URL'] = @repo_url
+      @process.environment['CI_PROJECT_ID'] = @project_id
+
       @process.start
 
       @tmp_file_path = @tmp_file.path
