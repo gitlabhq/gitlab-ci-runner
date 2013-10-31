@@ -12,7 +12,7 @@ MAINTAINER  Sytse Sijbrandij "sytse@gitlab.com"
 # docker run -e CI_SERVER_URL=https://ci.example.com -e REGISTRATION_TOKEN=replaceme -e HOME=/root -e GITLAB_SERVER_FQDN=gitlab.example.com gitlabhq/gitlab-ci-runner
 #
 # After you start the runner you can send it to the background with ctrl-z
-# The new unner should show up in the GitLab CI interface on /runners
+# The new runner should show up in the GitLab CI interface on /runners
 #
 # You can tart an interactive session to test new commands with:
 # docker run -e CI_SERVER_URL=https://ci.example.com -e REGISTRATION_TOKEN=replaceme -e HOME=/root -i -t gitlabhq/gitlab-ci-runner:latest /bin/bash
