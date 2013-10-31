@@ -41,23 +41,23 @@ module GitlabCi
         status = command line
         @state = :failed and return unless status
       end
-      @commands2 = []
+      @script_commands = []
       @scripts = YAML.load(File.open(project_dir+'/script.yml'))
       if @scripts.has_key?('before_script')
         @scripts['before_script'].each do |line|
-          @commands2.push(line)
+          @script_commands.push(line)
         end
       end
 
-      @commands2.push(@scripts['script'])
+      @script_commands.push(@scripts['script'])
       
       if @scripts.has_key?('after_script')
          @scripts['after_script'].each do |line|
-          @commands2.push(line)
+          @script_commands.push(line)
         end
       end
       
-      @commands2.each do |line|
+      @script_commands.each do |line|
         status = command line
         @state = :failed and return unless status
       end
