@@ -7,6 +7,11 @@ require 'json'
 module GitlabCi
   class Network
     include HTTParty
+    # Use http proxy if specified in the shell
+    if ENV["HTTP_PROXY"]
+      (protocol,host,port) = ENV["HTTP_PROXY"].split(/:\/\/|:/)
+      http_proxy host, port
+    end
 
     # check for available build from coordinator
     # and pick a pending one
