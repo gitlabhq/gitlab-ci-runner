@@ -45,7 +45,8 @@ module GitlabCi
       network.update_build(
         @current_build.id,
         @current_build.state,
-        @current_build.trace
+        @current_build.trace,
+        @current_build.results
       )
     end
 
