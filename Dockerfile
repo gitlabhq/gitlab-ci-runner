@@ -26,7 +26,7 @@ RUN apt-get install -y wget curl gcc libxml2-dev libxslt-dev libcurl4-openssl-de
 
 # Download Ruby and compile it
 RUN mkdir /tmp/ruby && cd /tmp/ruby && curl --progress http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p392.tar.gz | tar xz
-RUN cd /tmp/ruby/ruby-1.9.3-p392 && ./configure && make && make install
+RUN cd /tmp/ruby/ruby-1.9.3-p392 && ./configure --disable-install-rdoc && make && make install
 
 # Fix upstart under a virtual host https://github.com/dotcloud/docker/issues/1024
 RUN dpkg-divert --local --rename --add /sbin/initctl
