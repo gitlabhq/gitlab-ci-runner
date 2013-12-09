@@ -1,0 +1,10 @@
+# GITLAB CI Runner Log
+
+/var/log/gitlab_ci_runner.log {
+    weekly
+    missingok
+    rotate 4
+    compress
+    notifempty
+    copytruncate
+}
