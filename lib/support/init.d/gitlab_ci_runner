@@ -15,12 +15,13 @@ APP_USER="gitlab_ci_runner"
 PID_PATH="$APP_ROOT/tmp/pids"
 PROCESS_NAME="ruby ./bin/runner"
 RUNNERS_PID="$PID_PATH/runners.pid"
-RUNNERS_NUM=1 # number of runners to spawn 
+RUNNERS_NUM=1 # number of runners to spawn
 START_RUNNER="nohup bundle exec ./bin/runner"
 NAME="gitlab-ci-runner"
 DESC="GitLab CI runner"
 RUNNERS_REGISTERED=0
 RUNNERS_RUNNING=0
+INIT_LOG="/var/log/gitlab_ci_runner.log"
 
 check_pid() {
   # Number of registered runners in PID file
@@ -53,8 +54,13 @@ start() {
       # Spawn runners
       for (( i=1; i<=$RUNNERS_NUM; i++ ))
       do
+        # Check log file
+        if [ ! -f $INIT_LOG ]; then
+          touch $INIT_LOG
+          chown $APP_USER $INIT_LOG
+        fi
         echo "Starting runner #$i"
-        execute "$START_RUNNER  >/dev/null 2>&1 & echo \$! >> $RUNNERS_PID"
+        execute "$START_RUNNER  >> $INIT_LOG 2>&1 & echo \$! >> $RUNNERS_PID"
       done
       echo "SUCCESS: Started $RUNNERS_NUM $DESC(s)."
     fi
@@ -78,14 +84,14 @@ stop() {
    KILL_GHOSTS=1;
  fi
 
- echo -n "Trying to stop registered runners..." 
+ echo -n "Trying to stop registered runners..."
  if [ $RUNNERS_REGISTERED -gt 0 ]; then
    execute "cat $RUNNERS_PID | xargs kill -USR2"
    rm -f $RUNNERS_PID
-   echo "OK" 
+   echo "OK"
  else
    echo "FAILED!"
-   echo "Couldn't stop registered runners as there is no record of such in $RUNNERS_PID file". 
+   echo "Couldn't stop registered runners as there is no record of such in $RUNNERS_PID file".
  fi
 
  if [ $KILL_GHOSTS -eq 1 ]; then
