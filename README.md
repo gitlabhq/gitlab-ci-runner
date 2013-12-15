@@ -38,23 +38,22 @@ Install Ruby from source:
 
 a) Linux
 
-    mkdir /tmp/ruby
-    cd /tmp/ruby
-    curl --progress http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p392.tar.gz | tar xz
-    cd ruby-1.9.3-p392
-    ./configure
+    mkdir /tmp/ruby && cd /tmp/ruby
+    curl --progress ftp://ftp.ruby-lang.org/pub/ruby/2.0/ruby-2.0.0-p353.tar.gz | tar xz
+    cd ruby-2.0.0-p353
+    ./configure --disable-install-rdoc
     make
     sudo make install
 
-b) MacOSX (make sure you have the Xcode command line tools installed), UNTESTED
+b) Mac OS X (make sure you have the Xcode command line tools installed), UNTESTED
 
     brew update
     brew install rbenv
     brew install ruby-build
     brew install openssl
-    CC=gcc-4.7 RUBY_CONFIGURE_OPTS="--with-openssl-dir=`brew --prefix openssl` --with-readline-dir=`brew --prefix readline` --with-gcc=gcc-4.7 --enable-shared" rbenv install 1.9.3-p392
+    CC=gcc-4.7 RUBY_CONFIGURE_OPTS="--with-openssl-dir=`brew --prefix openssl` --with-readline-dir=`brew --prefix readline` --with-gcc=gcc-4.7 --enable-shared" rbenv install 2.0.0-p353
     echo 'if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi' >> ~/.profile
-    rbenv global 1.9.3-p194
+    rbenv global 2.0.0-p353
 
 Download the code for the runner:
 
