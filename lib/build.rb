@@ -80,12 +80,29 @@ module GitlabCi
       status = 0
 
       @output ||= ""
+      @tmp_file = Tempfile.new("child-output", binmode: true)
+      @tmp_file_path = @tmp_file.path
+
+      # don't do anything if the cmd is empty
+      if cmd.empty?
+        return true
+      end
+
       @output << "\n"
+      @output << "\033[0;30;1m"
+      @output << @ref
+      @output << "@"
+      @output << @ref_name
+      @output << ":~#\033[0m "
       @output << cmd
       @output << "\n"
 
+      # ignore comments
+      if cmd.start_with?( "#" )
+        return true
+      end
+
       @process = ChildProcess.build(cmd)
-      @tmp_file = Tempfile.new("child-output", binmode: true)
       @process.io.stdout = @tmp_file
       @process.io.stderr = @tmp_file
       @process.cwd = project_dir
@@ -104,8 +121,6 @@ module GitlabCi
       @process.environment['CI_BUILD_ID'] = @id
 
       @process.start
-
-      @tmp_file_path = @tmp_file.path
 
       begin
         @process.poll_for_exit(@timeout)
