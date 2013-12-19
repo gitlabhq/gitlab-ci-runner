@@ -4,6 +4,7 @@ require_relative 'config'
 require 'childprocess'
 require 'tempfile'
 require 'fileutils'
+require 'bundler'
 
 module GitlabCi
   class Build
@@ -38,7 +39,7 @@ module GitlabCi
       end
 
       @commands.each do |line|
-        status = command line
+        status = Bundler.with_clean_env { command line }
         @state = :failed and return unless status
       end
 
@@ -90,9 +91,7 @@ module GitlabCi
       @process.cwd = project_dir
 
       # ENV
-      @process.environment['BUNDLE_GEMFILE'] = File.join(project_dir, 'Gemfile')
-      @process.environment['BUNDLE_BIN_PATH'] = ''
-      @process.environment['RUBYOPT'] = ''
+      # Bundler.with_clean_env now handles PATH, GEM_HOME, RUBYOPT & BUNDLE_*.
 
       @process.environment['CI_SERVER'] = 'yes'
       @process.environment['CI_SERVER_NAME'] = 'GitLab CI'
