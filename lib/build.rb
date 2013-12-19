@@ -4,6 +4,7 @@ require_relative 'config'
 require 'childprocess'
 require 'tempfile'
 require 'fileutils'
+require 'yaml'
 
 module GitlabCi
   class Build
@@ -12,7 +13,7 @@ module GitlabCi
     attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :state, :before_sha
 
     def initialize(data)
-      @commands = data[:commands].to_a
+      @commands = []
       @ref = data[:ref]
       @ref_name = data[:ref_name]
       @id = data[:id]
@@ -36,12 +37,31 @@ module GitlabCi
         FileUtils.mkdir_p(project_dir)
         @commands.unshift(clone_cmd)
       end
-
       @commands.each do |line|
         status = command line
         @state = :failed and return unless status
       end
+      @script_commands = []
+      @scripts = YAML.load(File.open(project_dir+'/script.yml'))
+      if @scripts.has_key?('before_script')
+        @scripts['before_script'].each do |line|
+          @script_commands.push(line)
+        end
+      end
 
+      @script_commands.push(@scripts['script'])
+      
+      if @scripts.has_key?('after_script')
+         @scripts['after_script'].each do |line|
+          @script_commands.push(line)
+        end
+      end
+      
+      @script_commands.each do |line|
+        status = command line
+        @state = :failed and return unless status
+      end
+            
       @state = :success
     end
 
