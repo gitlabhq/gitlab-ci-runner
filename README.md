@@ -100,8 +100,8 @@ gitlab_ci_runner@server:/home/administrator$ cd ~/
 # perform the setup above
 
 gitlab_ci_runner@server:~$ exit;
-gitlab_ci_runner@server:/home/gitlab_ci_runner$ sudo cp ./gitlab-ci-runner/lib/support/init.d/gitlab_ci_runner /etc/init.d/gitlab-ci-runner
-gitlab_ci_runner@server:/home/gitlab_ci_runner$ cd ~
+administrator@server:~$ cd /home/gitlab_ci_runner/gitlab-runners
+administrator@server:~$ sudo cp ./gitlab-ci-runner/lib/support/init.d/gitlab_ci_runner /etc/init.d/gitlab-ci-runner
 administrator@server:~$ sudo chmod +x /etc/init.d/gitlab-ci-runner
 administrator@server:~$ sudo update-rc.d gitlab-ci-runner defaults 21 
 administrator@server:~$ sudo service gitlab-ci-runner start
