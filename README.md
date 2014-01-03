@@ -1,10 +1,8 @@
-## GitLab CI is an open-source continuous integration server
+## GitLab CI Runner
+
+This is GitLab CI **Runner** repository, this application run tests but it doesn't coordinate the testing. In the [GitLab CI repo](https://gitlab.com/gitlab-org/gitlab-ci) you can find the open-source continuous integration server that coordinates the testing.
 
 [![Code Climate](https://codeclimate.com/github/gitlabhq/gitlab-ci-runner.png)](https://codeclimate.com/github/gitlabhq/gitlab-ci-runner)
-
-![Screen](https://github.com/downloads/gitlabhq/gitlab-ci/gitlab_ci_preview.png)
-
-## This is Runner repository. This code will only run tests. For more information and the test coordinator please see the [gitlab-ci repo](https://github.com/gitlabhq/gitlab-ci).
 
 ### Requirements
 
@@ -60,7 +58,7 @@ Download the code for the runner:
     # Use any directory you like
     mkdir ~/gitlab-runners
     cd ~/gitlab-runners
-    git clone https://github.com/gitlabhq/gitlab-ci-runner.git
+    git clone https://gitlab.com/gitlab-org/gitlab-ci-runner.git
     cd gitlab-ci-runner
 
 Install the gems for the runner:
