@@ -84,7 +84,7 @@ module GitlabCi
       @output << cmd
       @output << "\n"
 
-      @process = ChildProcess.build(cmd)
+      @process = ChildProcess.build('bash', '--login', '-c', cmd)
       @tmp_file = Tempfile.new("child-output", binmode: true)
       @process.io.stdout = @tmp_file
       @process.io.stderr = @tmp_file
