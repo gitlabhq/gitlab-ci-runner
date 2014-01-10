@@ -108,7 +108,7 @@ administrator@server:~$ sudo service gitlab-ci-runner start
 
 ### Update
 
-In order to update runner to vew version just go to runner directory and do next: 
+In order to update the runner to a new version just go to runner directory and do next: 
 
     git fetch
     git checkout VERSION_YOU_NEED # Ex. v4.0.0
