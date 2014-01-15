@@ -99,19 +99,18 @@ gitlab_ci_runner@server:/home/administrator$ cd ~/
 
 gitlab_ci_runner@server:~$ exit;
 administrator@server:~$ cd /home/gitlab_ci_runner/gitlab-runners
-administrator@server:~$ sudo cp ./gitlab-ci-runner/lib/support/init.d/gitlab_ci_runner /etc/init.d/gitlab-ci-runner
-administrator@server:~$ sudo chmod +x /etc/init.d/gitlab-ci-runner
-administrator@server:~$ sudo update-rc.d gitlab-ci-runner defaults 21 
+administrator@server:~$ sudo ln -s ./gitlab-ci-runner/lib/support/init.d/gitlab_ci_runner /etc/init.d/gitlab-ci-runner
+administrator@server:~$ sudo update-rc.d gitlab-ci-runner defaults 21
 administrator@server:~$ sudo service gitlab-ci-runner start
 ```
 
 
 ### Update
 
-In order to update runner to vew version just go to runner directory and do next: 
+In order to update runner to vew version just go to runner directory and do next:
 
     git fetch
     git checkout VERSION_YOU_NEED # Ex. v4.0.0
-    bundle 
+    bundle
 
 And restart runner
