@@ -94,6 +94,8 @@ Setup the runner non-interactively:
 CI_SERVER_URL=https://ci.example.com REGISTRATION_TOKEN=replaceme bundle exec ./bin/setup
 ```
 
+The registration token can be found at: <http://gitlab-ci-domain.com/admin/runners>, accessible through Header > Runners.
+
 SSH into your GitLab server and confirm to add host key to known_hosts:
 
 ```bash
