@@ -77,7 +77,7 @@ cd gitlab-ci-runner
 Install the gems for the runner:
 
 ```
-bundle install
+bundle install --deployment
 ```
 
 Setup the runner interactively:
