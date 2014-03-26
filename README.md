@@ -133,7 +133,7 @@ bundle exec ./bin/runner
 
 ### Update
 
-In order to update runner to vew version just go to runner directory and do next: 
+In order to update the runner to a new version just go to runner directory and do next: 
 
 ```bash
 sudo su gitlab_ci_runner
