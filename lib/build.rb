@@ -6,6 +6,7 @@ require 'tempfile'
 require 'fileutils'
 require 'bundler'
 
+
 module GitlabCi
   class Build
     TIMEOUT = 7200
@@ -21,6 +22,7 @@ module GitlabCi
       @repo_url = data[:repo_url]
       @state = :waiting
       @before_sha = data[:before_sha]
+      @project_name = data[:project_name]
       @timeout = data[:timeout] || TIMEOUT
       @allow_git_fetch = data[:allow_git_fetch]
     end
@@ -102,7 +104,11 @@ module GitlabCi
       @process.environment['CI_BUILD_BEFORE_SHA'] = @before_sha
       @process.environment['CI_BUILD_REF_NAME'] = @ref_name
       @process.environment['CI_BUILD_ID'] = @id
-
+      @process.environment['CI_BUILD_PROJECT_NAME'] = @project_name
+      @process.environment['CI_BUILD_PROJECT_ID'] = @project_id
+      @process.environment['CI_BUILD_DIR'] = config.builds_dir
+      @process.environment['CI_BUILD_PROJECT_DIR'] = project_dir
+      
       @process.start
 
       @tmp_file_path = @tmp_file.path
@@ -131,7 +137,7 @@ module GitlabCi
 
     def checkout_cmd
       cmd = []
-      cmd << "cd #{project_dir}"
+      cmd << "cd #{project_dir}/#{@project_name}"
       cmd << "git reset --hard"
       cmd << "git checkout #{@ref}"
       cmd.join(" && ")
@@ -140,15 +146,16 @@ module GitlabCi
     def clone_cmd
       cmd = []
       cmd << "cd #{config.builds_dir}"
-      cmd << "git clone #{@repo_url} project-#{@project_id}"
-      cmd << "cd project-#{@project_id}"
-      cmd << "git checkout #{@ref}"
+
+      cmd << "git clone #{@repo_url} #{project_dir}/#{@project_name}"
+      cmd << "cd #{project_dir}/#{@project_name}"
+      cmd << "git checkout #{@ref_name}"
       cmd.join(" && ")
     end
 
     def fetch_cmd
       cmd = []
-      cmd << "cd #{project_dir}"
+      cmd << "cd #{project_dir}/#{@project_name}"
       cmd << "git reset --hard"
       cmd << "git clean -fdx"
       cmd << "git remote set-url origin #{@repo_url}"
@@ -157,7 +164,7 @@ module GitlabCi
     end
 
     def repo_exists?
-      File.exists?(File.join(project_dir, '.git'))
+      File.exists?(File.join("#{project_dir}/#{@project_name}", '.git'))
     end
 
     def config
