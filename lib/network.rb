@@ -1,7 +1,6 @@
 require_relative 'config'
 
 require 'httparty'
-require 'pry'
 require 'json'
 
 module GitlabCi
@@ -37,6 +36,8 @@ module GitlabCi
           ref_name: response['ref'],
           before_sha: response['before_sha'],
           project_name: response['project_name']
+          allow_git_fetch: response['allow_git_fetch'],
+          timeout: response['timeout']
         }
       elsif response.code == 403
         puts 'forbidden'

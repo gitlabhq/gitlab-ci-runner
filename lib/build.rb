@@ -4,6 +4,7 @@ require_relative 'config'
 require 'childprocess'
 require 'tempfile'
 require 'fileutils'
+require 'bundler'
 
 
 module GitlabCi
@@ -22,6 +23,8 @@ module GitlabCi
       @state = :waiting
       @before_sha = data[:before_sha]
       @project_name = data[:project_name]
+      @timeout = data[:timeout] || TIMEOUT
+      @allow_git_fetch = data[:allow_git_fetch]
     end
 
     def run
@@ -29,15 +32,16 @@ module GitlabCi
 
       @commands.unshift(checkout_cmd)
 
-      if repo_exists?
+      if repo_exists? && @allow_git_fetch
         @commands.unshift(fetch_cmd)
       else
+        FileUtils.rm_rf(project_dir)
         FileUtils.mkdir_p(project_dir)
         @commands.unshift(clone_cmd)
       end
 
       @commands.each do |line|
-        status = command line
+        status = Bundler.with_clean_env { command line }
         @state = :failed and return unless status
       end
 
@@ -82,16 +86,14 @@ module GitlabCi
       @output << cmd
       @output << "\n"
 
-      @process = ChildProcess.build(cmd)
+      @process = ChildProcess.build('bash', '--login', '-c', cmd)
       @tmp_file = Tempfile.new("child-output", binmode: true)
       @process.io.stdout = @tmp_file
       @process.io.stderr = @tmp_file
       @process.cwd = project_dir
 
       # ENV
-      @process.environment['BUNDLE_GEMFILE'] = File.join(project_dir, 'Gemfile')
-      @process.environment['BUNDLE_BIN_PATH'] = ''
-      @process.environment['RUBYOPT'] = ''
+      # Bundler.with_clean_env now handles PATH, GEM_HOME, RUBYOPT & BUNDLE_*.
 
       @process.environment['CI_SERVER'] = 'yes'
       @process.environment['CI_SERVER_NAME'] = 'GitLab CI'
@@ -112,7 +114,7 @@ module GitlabCi
       @tmp_file_path = @tmp_file.path
 
       begin
-        @process.poll_for_exit(TIMEOUT)
+        @process.poll_for_exit(@timeout)
       rescue ChildProcess::TimeoutError
         @output << "TIMEOUT"
         @process.stop # tries increasingly harsher methods to kill the process.
@@ -144,6 +146,7 @@ module GitlabCi
     def clone_cmd
       cmd = []
       cmd << "cd #{config.builds_dir}"
+
       cmd << "git clone #{@repo_url} #{project_dir}/#{@project_name}"
       cmd << "cd #{project_dir}/#{@project_name}"
       cmd << "git checkout #{@ref_name}"
@@ -154,8 +157,9 @@ module GitlabCi
       cmd = []
       cmd << "cd #{project_dir}/#{@project_name}"
       cmd << "git reset --hard"
-      cmd << "git clean -f"
-      cmd << "git fetch"
+      cmd << "git clean -fdx"
+      cmd << "git remote set-url origin #{@repo_url}"
+      cmd << "git fetch origin"
       cmd.join(" && ")
     end
 
