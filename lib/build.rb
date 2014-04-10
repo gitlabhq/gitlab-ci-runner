@@ -153,7 +153,7 @@ module GitlabCi
       cmd << "cd #{config.builds_dir}"
       cmd << "git clone #{@repo_url} project-#{@project_id}"
       cmd << "cd project-#{@project_id}"
-                  cmd << "git checkout #{@ref}"
+      cmd << "git checkout #{@ref}"
       cmd.join(" && ")
     end
 
