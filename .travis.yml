@@ -1,0 +1,13 @@
+language: ruby
+env:
+  - TRAVIS=true
+before_install:
+  - sudo apt-get install libicu-dev -y
+branches:
+  only:
+    - 'master'
+rvm:
+  - 1.9.3-p327
+  - 2.0.0
+script: "bundle exec rspec spec"
+

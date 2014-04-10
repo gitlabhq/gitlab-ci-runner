@@ -4,6 +4,7 @@ require_relative 'config'
 require 'childprocess'
 require 'tempfile'
 require 'fileutils'
+require 'bundler'
 
 module GitlabCi
   class Build
@@ -69,9 +70,9 @@ module GitlabCi
     end
 
     def results
-      @report_files.map { |f|
+      @report_files.map do |f|
         { file: f, content: read_file(File.expand_path(f['filename'], project_dir))}
-      }
+      end
     end
 
     def tmp_file_output
@@ -81,54 +82,49 @@ module GitlabCi
 
     private
 
-      def read_file(fi)
-        GitlabCi::Encode.encode!(File.binread(fi)) if fi && File.readable?(fi)
+    def read_file(fi)
+      GitlabCi::Encode.encode!(File.binread(fi)) if fi && File.readable?(fi)
+    end
+    
+    def command(cmd)
+      cmd = cmd.strip
+      status = 0
+
+      @output ||= ""
+      @output << "\n"
+      @output << cmd
+      @output << "\n"
+
+      @process = ChildProcess.build('bash', '--login', '-c', cmd)
+      @tmp_file = Tempfile.new("child-output", binmode: true)
+      @process.io.stdout = @tmp_file
+      @process.io.stderr = @tmp_file
+      @process.cwd = project_dir
+
+      # ENV
+      # Bundler.with_clean_env now handles PATH, GEM_HOME, RUBYOPT & BUNDLE_*.
+
+      @process.environment['CI_SERVER'] = 'yes'
+      @process.environment['CI_SERVER_NAME'] = 'GitLab CI'
+      @process.environment['CI_SERVER_VERSION'] = nil# GitlabCi::Version
+      @process.environment['CI_SERVER_REVISION'] = nil# GitlabCi::Revision
+
+      @process.environment['CI_BUILD_REF'] = @ref
+      @process.environment['CI_BUILD_BEFORE_SHA'] = @before_sha
+      @process.environment['CI_BUILD_REF_NAME'] = @ref_name
+      @process.environment['CI_BUILD_ID'] = @id
+
+      @process.start
+
+      @tmp_file_path = @tmp_file.path
+
+      begin
+        @process.poll_for_exit(@timeout)
+      rescue ChildProcess::TimeoutError
+        @output << "TIMEOUT"
+        @process.stop # tries increasingly harsher methods to kill the process.
+        return false
       end
-
-      def command(cmd)
-        cmd = cmd.strip
-        status = 0
-
-        @output ||= ""
-        @output << "\n"
-        @output << cmd
-        @output << "\n"
-
-        @process = ChildProcess.build(cmd)
-        @tmp_file = Tempfile.new("child-output", binmode: true)
-        @process.io.stdout = @tmp_file
-        @process.io.stderr = @tmp_file
-        @process.cwd = project_dir
-
-        # ENV
-        @process.environment['BUNDLE_GEMFILE'] = File.join(project_dir, 'Gemfile')
-        @process.environment['BUNDLE_BIN_PATH'] = ''
-        @process.environment['RUBYOPT'] = ''
-
-        @process.environment['CI_SERVER'] = 'yes'
-        @process.environment['CI_SERVER_NAME'] = 'GitLab CI'
-        @process.environment['CI_SERVER_VERSION'] = nil# GitlabCi::Version
-        @process.environment['CI_SERVER_REVISION'] = nil# GitlabCi::Revision
-
-        @process.environment['CI_BUILD_REF'] = @ref
-        @process.environment['CI_BUILD_BEFORE_SHA'] = @before_sha
-        @process.environment['CI_BUILD_REF_NAME'] = @ref_name
-        @process.environment['CI_BUILD_ID'] = @id
-
-        @process.environment['CI_PROJECT_REPO_URL'] = @repo_url
-        @process.environment['CI_PROJECT_ID'] = @project_id
-
-        @process.start
-
-        @tmp_file_path = @tmp_file.path
-
-        begin
-          @process.poll_for_exit(@timeout)
-        rescue ChildProcess::TimeoutError
-          @output << "TIMEOUT"
-          @process.stop # tries increasingly harsher methods to kill the process.
-          return false
-        end
 
         @process.exit_code == 0
 
