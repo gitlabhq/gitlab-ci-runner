@@ -126,57 +126,57 @@ module GitlabCi
         return false
       end
 
-        @process.exit_code == 0
+      @process.exit_code == 0
 
-      rescue => e
-        # return false if any exception occurs
-        @output << e.message
-        false
+    rescue => e
+      # return false if any exception occurs
+      @output << e.message
+      false
 
-      ensure
-        @tmp_file.rewind
-        @output << GitlabCi::Encode.encode!(@tmp_file.read)
-        @tmp_file.close
-        @tmp_file.unlink
-      end
+    ensure
+      @tmp_file.rewind
+      @output << GitlabCi::Encode.encode!(@tmp_file.read)
+      @tmp_file.close
+      @tmp_file.unlink
+    end
 
-      def checkout_cmd
-        cmd = []
-        cmd << "cd #{project_dir}"
-        cmd << "git reset --hard"
-        cmd << "git checkout #{@ref}"
-        cmd.join(" && ")
-      end
+    def checkout_cmd
+      cmd = []
+      cmd << "cd #{project_dir}"
+      cmd << "git reset --hard"
+      cmd << "git checkout #{@ref}"
+      cmd.join(" && ")
+    end
 
-      def clone_cmd
-        cmd = []
-        cmd << "cd #{config.builds_dir}"
-        cmd << "git clone #{@repo_url} project-#{@project_id}"
-        cmd << "cd project-#{@project_id}"
-		    cmd << "git checkout #{@ref}"
-        cmd.join(" && ")
-      end
+    def clone_cmd
+      cmd = []
+      cmd << "cd #{config.builds_dir}"
+      cmd << "git clone #{@repo_url} project-#{@project_id}"
+      cmd << "cd project-#{@project_id}"
+      cmd << "git checkout #{@ref}"
+      cmd.join(" && ")
+    end
 
-      def fetch_cmd
-        cmd = []
-        cmd << "cd #{project_dir}"
-        cmd << "git reset --hard"
-        cmd << "git clean -fdx"
-        cmd << "git remote set-url origin #{@repo_url}"
-        cmd << "git fetch origin"
-        cmd.join(" && ")
-      end
+    def fetch_cmd
+      cmd = []
+      cmd << "cd #{project_dir}"
+      cmd << "git reset --hard"
+      cmd << "git clean -fdx"
+      cmd << "git remote set-url origin #{@repo_url}"
+      cmd << "git fetch origin"
+      cmd.join(" && ")
+    end
 
-      def repo_exists?
-        File.exists?(File.join(project_dir, '.git'))
-      end
+    def repo_exists?
+      File.exists?(File.join(project_dir, '.git'))
+    end
 
-      def config
-        @config ||= Config.new
-      end
+    def config
+      @config ||= Config.new
+    end
 
-      def project_dir
-        File.join(config.builds_dir, "project-#{@project_id}")
-      end
+    def project_dir
+      File.join(config.builds_dir, "project-#{@project_id}")
+    end
   end
 end
