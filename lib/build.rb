@@ -40,8 +40,8 @@ module GitlabCi
       end
 
       @commands.each do |line|
-        status = command line
-        (@state = :failed) and return unless status
+        status = Bundler.with_clean_env { command line }
+        @state = :failed and return unless status
       end
 
       @state = :success
