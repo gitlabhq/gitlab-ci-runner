@@ -36,7 +36,8 @@ module GitlabCi
           ref_name: response['ref'],
           before_sha: response['before_sha'],
           allow_git_fetch: response['allow_git_fetch'],
-          timeout: response['timeout']
+          timeout: response['timeout'],
+          project_report_files: response['project_report_files']
         }
       elsif response.code == 403
         puts 'forbidden'
@@ -47,12 +48,13 @@ module GitlabCi
       puts 'failed'
     end
 
-    def update_build(id, state, trace)
+    def update_build(id, state, trace, reports)
       broadcast "Submitting build #{id} to coordinator..."
 
       options = default_options.merge(
         state: state,
         trace: trace,
+        reports: reports,
       )
 
       response = self.class.put("#{api_url}/builds/#{id}.json", body: options)

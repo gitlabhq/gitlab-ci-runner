@@ -10,7 +10,7 @@ module GitlabCi
   class Build
     TIMEOUT = 7200
 
-    attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :state, :before_sha
+    attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :state, :before_sha, :report_files
 
     def initialize(data)
       @commands = data[:commands].to_a
@@ -23,6 +23,7 @@ module GitlabCi
       @before_sha = data[:before_sha]
       @timeout = data[:timeout] || TIMEOUT
       @allow_git_fetch = data[:allow_git_fetch]
+      @report_files = data[:project_report_files].to_a || []
     end
 
     def run
@@ -68,13 +69,23 @@ module GitlabCi
       ''
     end
 
+    def results
+      @report_files.map do |f|
+        { file: f, content: read_file(File.expand_path(f['filename'], project_dir))}
+      end
+    end
+
     def tmp_file_output
-      tmp_file_output = GitlabCi::Encode.encode!(File.binread(tmp_file_path)) if tmp_file_path && File.readable?(tmp_file_path)
+      tmp_file_output = read_file tmp_file_path
       tmp_file_output ||= ''
     end
 
     private
 
+    def read_file(file)
+      GitlabCi::Encode.encode!(File.binread(file)) if file && File.readable?(file)
+    end
+    
     def command(cmd)
       cmd = cmd.strip
       status = 0
