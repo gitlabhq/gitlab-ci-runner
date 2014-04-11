@@ -83,7 +83,7 @@ module GitlabCi
     private
 
     def read_file(file)
-      GitlabCi::Encode.encode!(File.binread(file)) if fi && File.readable?(file)
+      GitlabCi::Encode.encode!(File.binread(file)) if file && File.readable?(file)
     end
     
     def command(cmd)
