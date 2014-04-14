@@ -151,7 +151,7 @@ GitLab.com uses GitLab-CI to test our own builds. To quickly spin up some extra 
 
 To quickly add a runner, have the registration token at hand and:
 
-- instantiate a new VPS with the snapshot `ci-gitlab-org-runner`
+- instantiate a new VPS with the snapshot `gitlab-ci-runner-2gb-2gbswap`
 - `bundle exec ./bin/setup`
 - `sudo service gitlab-ci-runner start`
 
