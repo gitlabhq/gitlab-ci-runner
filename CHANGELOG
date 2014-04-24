@@ -1,0 +1,4 @@
+v5.0.0
+  - Async command execution
+  - All commands executed as single bash script from tempfile
+  - The script itself is then exectued as a child process in its own session by the runner
