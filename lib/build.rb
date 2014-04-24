@@ -5,28 +5,30 @@ require 'childprocess'
 require 'tempfile'
 require 'fileutils'
 require 'bundler'
+require 'shellwords'
 
 module GitlabCi
   class Build
     TIMEOUT = 7200
 
-    attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :state, :before_sha
+    attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :before_sha
 
     def initialize(data)
+      @output = ""
       @commands = data[:commands].to_a
       @ref = data[:ref]
       @ref_name = data[:ref_name]
       @id = data[:id]
       @project_id = data[:project_id]
       @repo_url = data[:repo_url]
-      @state = :waiting
       @before_sha = data[:before_sha]
       @timeout = data[:timeout] || TIMEOUT
       @allow_git_fetch = data[:allow_git_fetch]
     end
 
     def run
-      @state = :running
+      @run_file = Tempfile.new("executor")
+      @run_file.chmod(0755)
 
       @commands.unshift(checkout_cmd)
 
@@ -38,28 +40,45 @@ module GitlabCi
         @commands.unshift(clone_cmd)
       end
 
-      @commands.each do |line|
-        status = Bundler.with_clean_env { command line }
-        @state = :failed and return unless status
-      end
+      @run_file.puts %|#!/bin/bash|
+      @run_file.puts %|set -e|
+      @run_file.puts %|trap 'kill -s INT 0' EXIT|
 
-      @state = :success
+      @commands.each do |command|
+        @run_file.puts %|echo #{command.shellescape}|
+        @run_file.puts(command)
+      end
+      @run_file.close
+
+      Bundler.with_clean_env { execute("setsid #{@run_file.path}") }
+    end
+
+    def state
+      return :success if success?
+      return :failed if failed?
+      :running
     end
 
     def completed?
-      success? || failed?
+      @process.exited?
     end
 
     def success?
-      state == :success
+      return nil unless completed?
+      @process.exit_code == 0
     end
 
     def failed?
-      state == :failed
+      return nil unless completed?
+      @process.exit_code != 0
     end
 
     def running?
-      state == :running
+      @process.alive?
+    end
+
+    def abort
+      @process.stop
     end
 
     def trace
@@ -73,16 +92,18 @@ module GitlabCi
       tmp_file_output ||= ''
     end
 
+    def cleanup
+      @tmp_file.rewind
+      @output << GitlabCi::Encode.encode!(@tmp_file.read)
+      @tmp_file.close
+      @tmp_file.unlink
+      @run_file.unlink
+    end
+
     private
 
-    def command(cmd)
+    def execute(cmd)
       cmd = cmd.strip
-      status = 0
-
-      @output ||= ""
-      @output << "\n"
-      @output << cmd
-      @output << "\n"
 
       @process = ChildProcess.build('bash', '--login', '-c', cmd)
       @tmp_file = Tempfile.new("child-output", binmode: true)
@@ -106,27 +127,8 @@ module GitlabCi
       @process.start
 
       @tmp_file_path = @tmp_file.path
-
-      begin
-        @process.poll_for_exit(@timeout)
-      rescue ChildProcess::TimeoutError
-        @output << "TIMEOUT"
-        @process.stop # tries increasingly harsher methods to kill the process.
-        return false
-      end
-
-      @process.exit_code == 0
-
     rescue => e
-      # return false if any exception occurs
       @output << e.message
-      false
-
-    ensure
-      @tmp_file.rewind
-      @output << GitlabCi::Encode.encode!(@tmp_file.read)
-      @tmp_file.close
-      @tmp_file.unlink
     end
 
     def checkout_cmd

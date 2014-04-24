@@ -8,14 +8,13 @@ module GitlabCi
     def initialize
       puts '* Gitlab CI Runner started'
       puts '* Waiting for builds'
-
       loop do
-        if completed? || running?
+        if running?
+          push_build
           update_build
         else
           get_build
         end
-
         sleep 5
       end
     end
@@ -26,32 +25,26 @@ module GitlabCi
       @current_build
     end
 
-    def completed?
-      @current_build && @current_build.completed?
-    end
-
     def update_build
-      if @current_build.completed?
-        if push_build
-          puts "#{Time.now.to_s} | Completed build #{@current_build.id}"
-          @current_build = nil
-        end
-      else
-        push_build
-      end
+      return unless @current_build.completed?
+      puts "#{Time.now.to_s} | Completed build #{@current_build.id}, #{@current_build.state}."
+      @current_build.cleanup
+      @current_build = nil
     end
 
     def push_build
-      network.update_build(
-        @current_build.id,
-        @current_build.state,
-        @current_build.trace
-      )
+      case network.update_build(@current_build.id, @current_build.state, @current_build.trace)
+      when :success
+        # nothing to do here
+      when :aborted
+        @current_build.abort
+      when :failure
+        # nothing to do here, we simply assume this is a temporary failure communicating with the gitlab-ci server
+      end
     end
 
     def get_build
       build_data = network.get_build
-
       if build_data
         run(build_data)
       else
@@ -65,14 +58,9 @@ module GitlabCi
 
     def run(build_data)
       @current_build = GitlabCi::Build.new(build_data)
-
-      Thread.abort_on_exception = true
-
-      Thread.new(@current_build) do
-        puts "#{Time.now.to_s} | Build #{@current_build.id} started.."
-
-        @current_build.run
-      end
+      puts "#{Time.now.to_s} | Starting new build #{@current_build.id}..."
+      @current_build.run
+      puts "#{Time.now.to_s} | Build #{@current_build.id} started."
     end
 
     def collect_trace
