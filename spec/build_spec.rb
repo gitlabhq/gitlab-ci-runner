@@ -5,7 +5,12 @@ describe 'Build' do
   describe :run do
     let(:build) { GitlabCi::Build.new(build_data) }
 
-    before { build.run }
+    before do
+      build.run
+      loop do
+        break if build.completed?
+      end
+    end
 
     it { build.trace.should include 'bundle' }
     it { build.trace.should include 'HEAD is now at 2e008a7' }
