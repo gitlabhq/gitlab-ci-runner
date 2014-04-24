@@ -57,15 +57,20 @@ module GitlabCi
 
       response = self.class.put("#{api_url}/builds/#{id}.json", body: options)
 
-      if response.code == 200
+      case response.code
+      when 200
         puts 'ok'
-        true
+        :success
+      when 404
+        puts 'aborted'
+        :aborted
       else
-        puts 'failed'
+        puts "response error: #{response.code}"
+        :failure
       end
-    rescue
-      puts 'failed'
-      false
+    rescue => e
+      puts "failure: #{e.message}"
+      :failure
     end
 
     def register_runner(public_key, token)

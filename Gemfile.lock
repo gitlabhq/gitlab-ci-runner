@@ -2,6 +2,7 @@ GEM
   remote: http://rubygems.org/
   specs:
     addressable (2.3.4)
+    awesome_print (1.2.0)
     charlock_holmes (0.6.9.4)
     childprocess (0.3.6)
       ffi (~> 1.0, >= 1.0.6)
@@ -73,6 +74,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  awesome_print
   charlock_holmes (= 0.6.9.4)
   childprocess (= 0.3.6)
   coveralls

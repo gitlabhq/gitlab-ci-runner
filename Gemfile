@@ -13,4 +13,5 @@ group :development do
   gem 'guard-rspec'
   gem 'vcr'
   gem 'pry'
+  gem 'awesome_print'
 end
