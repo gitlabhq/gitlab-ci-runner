@@ -2,6 +2,7 @@
 
 This is GitLab CI **Runner** repository, this application run tests but it doesn't coordinate the testing. In the [GitLab CI repo](https://gitlab.com/gitlab-org/gitlab-ci) you can find the open-source continuous integration server that coordinates the testing.
 
+[![build status](https://ci.gitlab.org/projects/8/status.png?ref=master)](https://ci.gitlab.org/projects/8?ref=master)
 [![Code Climate](https://codeclimate.com/github/gitlabhq/gitlab-ci-runner.png)](https://codeclimate.com/github/gitlabhq/gitlab-ci-runner)
 
 ### Requirements
