@@ -45,6 +45,7 @@ module GitlabCi
       @run_file.puts %|trap 'kill -s INT 0' EXIT|
 
       @commands.each do |command|
+        command.strip!
         @run_file.puts %|echo #{command.shellescape}|
         @run_file.puts(command)
       end
