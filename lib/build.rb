@@ -11,10 +11,11 @@ module GitlabCi
   class Build
     TIMEOUT = 7200
 
-    attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :before_sha
+    attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :before_sha, :run_at, :post_message
 
     def initialize(data)
       @output = ""
+      @post_message = ""
       @commands = data[:commands].to_a
       @ref = data[:ref]
       @ref_name = data[:ref_name]
@@ -50,6 +51,7 @@ module GitlabCi
         @run_file.puts(command)
       end
       @run_file.close
+      @run_at = Time.now
 
       Bundler.with_clean_env { execute("setsid #{@run_file.path}") }
     end
@@ -83,7 +85,7 @@ module GitlabCi
     end
 
     def trace
-      output + tmp_file_output
+      output + tmp_file_output + post_message
     rescue
       ''
     end
@@ -99,6 +101,22 @@ module GitlabCi
       @tmp_file.close
       @tmp_file.unlink
       @run_file.unlink
+    end
+
+    # Check if build execution is longer
+    # than allowed by timeout
+    def running_too_long?
+      if @run_at && @timeout
+        @run_at + @timeout < Time.now
+      else
+        false
+      end
+    end
+
+    def timeout_abort
+      self.abort
+
+      @post_message = "\nCI Timeout. Execution took longer then #{@timeout} seconds"
     end
 
     private

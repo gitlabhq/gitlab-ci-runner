@@ -10,6 +10,7 @@ module GitlabCi
       puts '* Waiting for builds'
       loop do
         if running?
+          abort_if_timeout
           push_build
           update_build
         else
@@ -23,6 +24,12 @@ module GitlabCi
 
     def running?
       @current_build
+    end
+
+    def abort_if_timeout
+      if @current_build.running? && @current_build.running_too_long?
+        @current_build.timeout_abort
+      end
     end
 
     def update_build
