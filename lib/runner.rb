@@ -35,18 +35,28 @@ module GitlabCi
     def update_build
       return unless @current_build.completed?
       puts "#{Time.now.to_s} | Completed build #{@current_build.id}, #{@current_build.state}."
-      @current_build.cleanup
-      @current_build = nil
+
+      # Make sure we push latest build info submitted
+      # before we clean build
+      if push_build
+        @current_build.cleanup
+        @current_build = nil
+      else
+        # wait when ci server will be online again to submit build results
+      end
     end
 
     def push_build
       case network.update_build(@current_build.id, @current_build.state, @current_build.trace)
       when :success
         # nothing to do here
+        true
       when :aborted
         @current_build.abort
+        true
       when :failure
         # nothing to do here, we simply assume this is a temporary failure communicating with the gitlab-ci server
+        false
       end
     end
 
