@@ -29,7 +29,7 @@ module GitlabCi
 
     def run
       @run_file = Tempfile.new("executor")
-      @run_file.chmod(0755)
+      @run_file.chmod(0700)
 
       @commands.unshift(checkout_cmd)
 
