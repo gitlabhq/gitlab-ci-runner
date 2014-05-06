@@ -6,7 +6,6 @@ module GitlabCi
   class Setup
     def initialize
       build_config
-      generate_ssh_key
       register_runner
     end
 
@@ -22,14 +21,8 @@ module GitlabCi
       Config.new.write('url', url)
     end
 
-    def generate_ssh_key
-      system('ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""') # Create a key without a password.
-    end
-
     def register_runner
       registered = false
-
-      public_key = File.read(File.expand_path('~/.ssh/id_rsa.pub'))
 
       until registered
         token = ENV['REGISTRATION_TOKEN']
@@ -38,8 +31,8 @@ module GitlabCi
           token = gets.chomp
         end
 
-        puts "Registering runner with public key type: #{public_key[0..6]}, registration token: #{token}, url: #{Config.new.url}."
-        runner = Network.new.register_runner(public_key, token)
+        puts "Registering runner with registration token: #{token}, url: #{Config.new.url}."
+        runner = Network.new.register_runner(token)
 
         if runner
           write_token(runner[:token])
