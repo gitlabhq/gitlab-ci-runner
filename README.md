@@ -97,11 +97,6 @@ CI_SERVER_URL=https://ci.example.com REGISTRATION_TOKEN=replaceme bundle exec ./
 
 The registration token can be found at: <http://gitlab-ci-domain.com/admin/runners>, accessible through Header > Runners.
 
-SSH into your GitLab server and confirm to add host key to known_hosts:
-
-```bash
-ssh git@<your gitlab url>
-```
 
 Place the init.d file:
 
