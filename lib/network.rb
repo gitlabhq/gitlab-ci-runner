@@ -73,9 +73,8 @@ module GitlabCi
       :failure
     end
 
-    def register_runner(public_key, token)
+    def register_runner(token)
       body = {
-        public_key: public_key,
         token: token
       }
 
