@@ -14,7 +14,7 @@ MAINTAINER  Sytse Sijbrandij "sytse@gitlab.com"
 # After you start the runner you can send it to the background with ctrl-z
 # The new runner should show up in the GitLab CI interface on /runners
 #
-# You can tart an interactive session to test new commands with:
+# You can start an interactive session to test new commands with:
 # docker run -e CI_SERVER_URL=https://ci.example.com -e REGISTRATION_TOKEN=replaceme -e HOME=/root -i -t gitlabhq/gitlab-ci-runner:latest /bin/bash
 #
 # If you ever want to freshly rebuild the runner please use:
@@ -63,6 +63,6 @@ RUN git clone https://github.com/gitlabhq/gitlab-ci-runner.git /gitlab-ci-runner
 # Install the gems for the runner
 RUN cd /gitlab-ci-runner && gem install bundler && bundle install
 
-# When the image is started add the remote server key, unstall the runner and run it
+# When the image is started add the remote server key, set up the runner and run it
 WORKDIR /gitlab-ci-runner
 CMD ssh-keyscan -H $GITLAB_SERVER_FQDN >> /root/.ssh/known_hosts && mysqld & /root/redis-stable/src/redis-server & /etc/init.d/postgresql start & bundle exec ./bin/setup_and_run
