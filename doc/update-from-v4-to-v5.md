@@ -10,7 +10,10 @@
     cd ~/gitlab-ci-runner
     git fetch origin
     git checkout 5-0-stable
+    
+## 3. Install Gems
+    bundle install --deployment
 
-## 3. Start Runner
+## 4. Start Runner
 
     sudo service gitlab-ci-runner start
