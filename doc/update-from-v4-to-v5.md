@@ -10,6 +10,7 @@
     cd ~/gitlab-ci-runner
     git fetch origin
     git checkout 5-0-stable
+    bundle install --deployment
 
 ## 3. Start Runner
 
