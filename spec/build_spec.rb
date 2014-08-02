@@ -3,7 +3,7 @@ require_relative '../lib/build'
 
 describe 'Build' do
   describe :run do
-    let(:build) { GitlabCi::Build.new(build_data) }
+    let(:build) { GitlabCi::Build.new(0, build_data) }
 
     before do
       build.run
