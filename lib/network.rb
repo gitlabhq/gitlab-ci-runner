@@ -7,6 +7,10 @@ module GitlabCi
   class Network
     include HTTParty
 
+    def initialize(runner)
+      @runner = runner
+    end
+
     # check for available build from coordinator
     # and pick a pending one
     # {
@@ -95,7 +99,7 @@ module GitlabCi
     private
 
     def broadcast message
-      print "#{Time.now.to_s} | #{message}"
+      print "#{Time.now.to_s} | #{@runner} | #{message}"
     end
 
     def api_url
@@ -107,7 +111,7 @@ module GitlabCi
     end
 
     def config
-      @config ||= Config.new
+      @config ||= Config.new(@runner)
     end
 
     def default_options

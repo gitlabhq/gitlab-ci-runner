@@ -13,7 +13,8 @@ module GitlabCi
 
     attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :before_sha, :run_at, :post_message
 
-    def initialize(data)
+    def initialize(runner, data)
+      @runner = runner
       @output = ""
       @post_message = ""
       @commands = data[:commands].to_a
@@ -182,7 +183,7 @@ module GitlabCi
     end
 
     def config
-      @config ||= Config.new
+      @config ||= Config.new(@runner)
     end
 
     def project_dir

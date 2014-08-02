@@ -2,26 +2,26 @@
 
 ### BEGIN INIT INFO
 # Provides:          gitlab-ci-runner
-# Required-Start:    $local_fs $remote_fs $network $syslog
-# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Required-Start:    $local_fs $remote_fs $network $syslog gitlab_ci
+# Required-Stop:     $local_fs $remote_fs $network $syslog gitlab_ci
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: GitLab CI Runner init.d script
 # Description:       Enables automatic start of runners at boot time in the background.
 ### END INIT INFO
 
-APP_ROOT="/home/gitlab_ci_runner/gitlab-ci-runner"
-APP_USER="gitlab_ci_runner"
+APP_ROOT="/home/git/gitlab-ci-runner"
+APP_USER="git"
 PID_PATH="$APP_ROOT/tmp/pids"
 PROCESS_NAME="ruby ./bin/runner"
 RUNNERS_PID="$PID_PATH/runners.pid"
-RUNNERS_NUM=1 # number of runners to spawn
+RUNNERS_NUM=10 # number of runners to spawn 
 START_RUNNER="nohup bundle exec ./bin/runner"
 NAME="gitlab-ci-runner"
 DESC="GitLab CI runner"
 RUNNERS_REGISTERED=0
 RUNNERS_RUNNING=0
-INIT_LOG="/var/log/gitlab_ci_runner.log"
+INIT_LOG="$APP_ROOT/log/gitlab_ci_runner.log"
 
 check_pid() {
   # Number of registered runners in PID file
@@ -60,7 +60,7 @@ start() {
           chown $APP_USER $INIT_LOG
         fi
         echo "Starting runner #$i"
-        execute "$START_RUNNER  >> $INIT_LOG 2>&1 & echo \$! >> $RUNNERS_PID"
+        execute "$START_RUNNER $i >> $INIT_LOG 2>&1 & echo \$! >> $RUNNERS_PID"
       done
       echo "SUCCESS: Started $RUNNERS_NUM $DESC(s)."
     fi
@@ -86,7 +86,7 @@ stop() {
 
  echo -n "Trying to stop registered runners..."
  if [ $RUNNERS_REGISTERED -gt 0 ]; then
-   execute "cat $RUNNERS_PID | xargs kill -USR2"
+   execute "cat $RUNNERS_PID | xargs kill -9"
    rm -f $RUNNERS_PID
    echo "OK"
  else
@@ -96,7 +96,7 @@ stop() {
 
  if [ $KILL_GHOSTS -eq 1 ]; then
    echo -ne "Trying to kill ghost runners..."
-   ps -C "$PROCESS_NAME" -o "%p" h | xargs kill -USR2
+   ps -C "$PROCESS_NAME" -o "%p" h | xargs kill -9
    [ $? -eq 0 ] && echo "OK"
  else
    echo "No ghost runners have been found.This is good."
