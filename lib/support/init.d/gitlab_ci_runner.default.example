@@ -1,0 +1,29 @@
+# Copy this lib/support/init.d/gitlab_ci_runner.default.example file to
+# /etc/default/gitlab_ci_runner in order for it to apply to your system.
+
+# app_user defines the user that GitLab is run as.
+# The default is "gitlab_ci_runner".
+app_user="gitlab_ci_runner"
+
+# app_root defines the folder in which gitlab and it's components are installed.
+# The default is "/home/$app_user/gitlab-ci-runner"
+app_root="/home/$app_user/gitlab-ci-runner"
+
+# pid_path defines a folder in which the gitlab-ci-runner place its pid.
+# This variable is also used below to define the relevant pids for the gitlab_ci_runner components.
+# The default is "$app_root/tmp/pids"
+pid_path="$app_root/tmp/pids"
+
+# init_log defines a file in which the runners write their log messages.
+# The default is "/var/log/gitlab_ci_runner.log"
+init_log="/var/log/gitlab_ci_runner.log"
+
+# Runner Configuration
+
+# runners_pid_path defines a file in which the individual runners place their pids.
+# The default is "$pid_path/runners.pid"
+runners_pid="$pid_path/runners.pid"
+
+# runners_num defines the number how much runners will get started.
+# The default is 1
+runners_num=1
