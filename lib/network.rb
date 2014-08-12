@@ -16,8 +16,6 @@ module GitlabCi
     #   id: rand(1900)
     # }
     def get_build
-      broadcast 'Checking for builds...'
-
       opts = {
         body: default_options.to_json,
         headers: {"Content-Type" => "application/json"},
@@ -26,30 +24,33 @@ module GitlabCi
       response = self.class.post(api_url + '/builds/register.json', opts)
 
       if response.code == 201
-        puts 'received'
+        broadcast 'Checking for builds... received'
         {
           id: response['id'],
           project_id: response['project_id'],
           commands: response['commands'].lines,
           repo_url: response['repo_url'],
           ref: response['sha'],
+          ref_type: response['ref_type'],
           ref_name: response['ref'],
           before_sha: response['before_sha'],
           allow_git_fetch: response['allow_git_fetch'],
-          timeout: response['timeout']
+          timeout: response['timeout'],
+          build_method: response['build_method'] || 'shell',
+          build_os: response['build_os'],
+          build_image: response['build_image'],
+          custom_commands: response['custom_commands']
         }
       elsif response.code == 403
-        puts 'forbidden'
+        broadcast 'Checking for builds... forbidden'
       else
-        puts 'nothing'
+        broadcast 'Checking for builds... nothing'
       end
     rescue
-      puts 'failed'
+      broadcast 'Checking for builds... failed'
     end
 
     def update_build(id, state, trace)
-      broadcast "Submitting build #{id} to coordinator..."
-
       options = default_options.merge(
         state: state,
         trace: trace,
@@ -59,17 +60,17 @@ module GitlabCi
 
       case response.code
       when 200
-        puts 'ok'
+        broadcast "Submitting build #{id} to coordinator... ok"
         :success
       when 404
-        puts 'aborted'
+        broadcast "Submitting build #{id} to coordinator... aborted"
         :aborted
       else
-        puts "response error: #{response.code}"
+        broadcast "Submitting build #{id} to coordinator... response error: #{response.code}"
         :failure
       end
     rescue => e
-      puts "failure: #{e.message}"
+      broadcast "Submitting build #{id} to coordinator... failure: #{e.message}"
       :failure
     end
 
@@ -95,7 +96,7 @@ module GitlabCi
     private
 
     def broadcast message
-      print "#{Time.now.to_s} | #{message}"
+      puts "#{Time.now.to_s} | #{message}"
     end
 
     def api_url
@@ -112,7 +113,9 @@ module GitlabCi
 
     def default_options
       {
-        token: token
+        token: token,
+        os: @config.os,
+        images: @config.images
       }
     end
   end

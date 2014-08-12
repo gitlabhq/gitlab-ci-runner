@@ -18,7 +18,8 @@ module GitlabCi
         url = gets.chomp
       end
 
-      Config.new.write('url', url)
+      config.write('url', url)
+      config.write('workers', config.workers)
     end
 
     def register_runner
@@ -31,7 +32,7 @@ module GitlabCi
           token = gets.chomp
         end
 
-        puts "Registering runner with registration token: #{token}, url: #{Config.new.url}."
+        puts "Registering runner with registration token: #{token}, url: #{config.url}."
         runner = Network.new.register_runner(token)
 
         if runner
@@ -47,7 +48,13 @@ module GitlabCi
     def write_token(token)
       puts "Runner token: #{token}"
 
-      Config.new.write('token', token)
+      config.write('token', token)
+    end
+
+    private
+
+    def config
+      @config ||= Config.new
     end
   end
 end

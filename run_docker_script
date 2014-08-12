@@ -1,0 +1,116 @@
+#!/bin/bash
+
+echo "Using worker: `hostname`"
+
+set -e
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 <script>"
+    exit 1
+fi
+
+fail() {
+    echo "$@"
+    exit 1
+}
+
+travis_fold() {
+      local action=$1
+      local name=$2
+      local ANSI_CLEAR="\033[0K"
+      echo -en "travis_fold:${action}:${name}\r${ANSI_CLEAR}"
+}
+
+VOLUME_OPTS=""
+VOLUME_CMD="true"
+
+travis_fold start "virtual-machine"
+echo "Provisioning Virtual Machine..."
+
+if [[ "$CI_BUILD_OS" != "linux" ]]; then
+    echo "We support only Linux!"
+    exit 1
+fi
+
+BUILD_CACHE="${CI_BUILD_METHOD}_cache_${CI_PROJECT_ID}_job_${CI_BUILD_JOB_ID}"
+
+case "$CI_BUILD_METHOD" in
+    travis)
+        case "$CI_BUILD_IMAGE" in
+        ayufan/travis_linux_worker:android)
+            VOLUME_OPTS="-v /home/travis/.gradle -v /home/travis/.android/cache -v /home/travis/.cache"
+            VOLUME_CMD="chown 1000:1000 /home/travis/.gradle /home/travis/.android/cache /home/travis/.cache"
+            ;;
+
+        *)
+            ;;
+        esac
+        ;;
+
+    *)
+        VOLUME_OPTS="-v /cache"
+        VOLUME_CMD="true"
+        ;;
+esac
+
+stop_docker() {
+    docker kill $id 1>/dev/null 2>/dev/null
+    docker rm -f $id 1>/dev/null 2>/dev/null
+}
+
+# Create build cache
+if ! docker inspect "$BUILD_CACHE" >/dev/null 2>/dev/null; then
+    docker run $VOLUME_OPTS --name="$BUILD_CACHE" busybox:latest $VOLUME_CMD
+fi
+
+emit_env_vars() {
+    for KEY in CI_SERVER CI_SERVER_NAME CI_SERVER_VERSION CI_SERVER_REVISION \
+               CI_BUILD_REF CI_BUILD_BEFORE_SHA CI_BUILD_REF_NAME CI_BUILD_REF_TYPE \
+               CI_BUILD_ID CI_BUILD_METHOD CI_BUILD_OS CI_BUILD_IMAGE CI_BUILD_ALLOW_GIT_FETCH \
+               CI_BUILD_TIMEOUT CI_BUILD_JOB_ID CI_PROJECT_ID CI_RUNNER_ID; do
+        echo "$KEY=${!KEY}"
+    done
+}
+
+case "$CI_BUILD_METHOD" in
+    travis)
+        # Start container with /sbin/init and connect to it with ssh
+        if ! which sshpass 1>/dev/null 2>/dev/null; then
+            echo "Please install sshpass."
+            exit 1
+        fi
+
+        id=$(docker run --volumes-from="$BUILD_CACHE" --env-file=<(emit_env_vars) -d "$CI_BUILD_IMAGE" /sbin/init)
+        trap stop_docker EXIT
+
+        IMAGE_USER="travis"
+        IP="$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' $id)"
+        PORT="22"
+        SSH_COMMAND="sshpass -p $IMAGE_USER ssh -p $PORT -o ConnectionAttempts=10 -o ConnectTimeout=10 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $IMAGE_USER@$IP"
+
+        wait_for_ssh() {
+            for i in $(seq 1 10)
+            do
+                $SSH_COMMAND exit 0 1>/dev/null 2>/dev/null && return 0
+                echo "Waiting for SSH ($i)..."
+                sleep 3s
+            done
+            return 1
+        }
+
+        wait_for_ssh
+        travis_fold end "virtual-machine"
+
+        echo "Running build script..."
+        $SSH_COMMAND $SSH_LOGIN bash --login < "$1"
+        ;;
+
+    *)
+        travis_fold end "virtual-machine"
+
+        echo "Running build script..."
+        docker run --rm -i --volumes-from="$BUILD_CACHE" --env-file=<(emit_env_vars) "$CI_BUILD_IMAGE" /bin/bash --login < "$1"
+        ;;
+esac
+
+

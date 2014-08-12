@@ -2,6 +2,7 @@ require_relative 'encode'
 require_relative 'config'
 
 require 'childprocess'
+require 'pty'
 require 'tempfile'
 require 'fileutils'
 require 'bundler'
@@ -11,7 +12,8 @@ module GitlabCi
   class Build
     TIMEOUT = 7200
 
-    attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :before_sha, :run_at, :post_message
+    attr_accessor :id, :commands, :ref, :ref_type, :tmp_file_path, :output, :before_sha, :run_at, :post_message,
+                  :build_method, :build_os, :build_image, :custom_commands, :job_id
 
     def initialize(data)
       @output = ""
@@ -19,41 +21,52 @@ module GitlabCi
       @commands = data[:commands].to_a
       @ref = data[:ref]
       @ref_name = data[:ref_name]
+      @ref_type = data[:ref_type]
       @id = data[:id]
       @project_id = data[:project_id]
       @repo_url = data[:repo_url]
       @before_sha = data[:before_sha]
       @timeout = data[:timeout] || TIMEOUT
       @allow_git_fetch = data[:allow_git_fetch]
+      @build_method = data[:build_method]
+      @build_os = data[:build_os]
+      @build_image = data[:build_image]
+      @custom_commands = data[:custom_commands]
+      @job_id = 0
+      @runner_id = data[:runner_id] || 0
     end
 
     def run
-      @run_file = Tempfile.new("executor")
-      @run_file.chmod(0700)
+      open_build_script_file
 
-      @commands.unshift(checkout_cmd)
-
-      if repo_exists? && @allow_git_fetch
-        @commands.unshift(fetch_cmd)
+      if @custom_commands
+        @commands.each do |command|
+          @run_file.puts(command)
+        end
       else
-        FileUtils.rm_rf(project_dir)
-        FileUtils.mkdir_p(project_dir)
-        @commands.unshift(clone_cmd)
+        @run_file.puts %|#!/bin/bash|
+        @run_file.puts %|set -e|
+        @run_file.puts %|trap 'kill -s INT 0' EXIT|
+
+        if @allow_git_fetch
+          @run_file.puts %|if [[ -e #{project_dir.shellescape}/.git ]]; then #{fetch_cmd}; else #{clone_cmd}; fi|
+        else
+          @run_file.puts(clone_cmd)
+        end
+
+        @run_file.puts(checkout_cmd)
+
+        @commands.each do |command|
+          command.strip!
+          @run_file.puts %|echo #{command.shellescape}|
+          @run_file.puts(command)
+        end
       end
 
-      @run_file.puts %|#!/bin/bash|
-      @run_file.puts %|set -e|
-      @run_file.puts %|trap 'kill -s INT 0' EXIT|
-
-      @commands.each do |command|
-        command.strip!
-        @run_file.puts %|echo #{command.shellescape}|
-        @run_file.puts(command)
-      end
-      @run_file.close
+      @run_file.flush
       @run_at = Time.now
 
-      Bundler.with_clean_env { execute("setsid #{@run_file.path}") }
+      Bundler.with_clean_env { execute("#{config.execute_script} #{@run_file.path}") }
     end
 
     def state
@@ -100,7 +113,7 @@ module GitlabCi
       @output << GitlabCi::Encode.encode!(@tmp_file.read)
       @tmp_file.close
       @tmp_file.unlink
-      @run_file.unlink
+      @run_file.close
     end
 
     # Check if build execution is longer
@@ -121,6 +134,24 @@ module GitlabCi
 
     private
 
+    def open_build_script_file
+      FileUtils.mkdir_p(config.scripts_dir)
+
+      @job_id = 0
+
+      while true
+        # try to acquire lock
+        @run_file = File.open(project_build_script, File::RDWR|File::CREAT, 0700)
+        next unless @run_file
+        lock_result = @run_file.flock(File::LOCK_EX|File::LOCK_NB)
+        break if lock_result
+        @run_file.close
+        @job_id += 1
+      end
+
+      @run_file.truncate(0)
+    end
+
     def execute(cmd)
       cmd = cmd.strip
 
@@ -128,7 +159,6 @@ module GitlabCi
       @tmp_file = Tempfile.new("child-output", binmode: true)
       @process.io.stdout = @tmp_file
       @process.io.stderr = @tmp_file
-      @process.cwd = project_dir
 
       # ENV
       # Bundler.with_clean_env now handles PATH, GEM_HOME, RUBYOPT & BUNDLE_*.
@@ -141,7 +171,17 @@ module GitlabCi
       @process.environment['CI_BUILD_REF'] = @ref
       @process.environment['CI_BUILD_BEFORE_SHA'] = @before_sha
       @process.environment['CI_BUILD_REF_NAME'] = @ref_name
+      @process.environment['CI_BUILD_REF_TYPE'] = @ref_type
       @process.environment['CI_BUILD_ID'] = @id
+      @process.environment['CI_BUILD_METHOD'] = @build_method
+      @process.environment['CI_BUILD_OS'] = @build_os
+      @process.environment['CI_BUILD_IMAGE'] = @build_image
+      @process.environment['CI_BUILD_ALLOW_GIT_FETCH'] = @allow_git_fetch
+      @process.environment['CI_BUILD_TIMEOUT'] = @timeout
+      @process.environment['CI_BUILD_JOB_ID'] = @job_id
+
+      @process.environment['CI_PROJECT_ID'] = @project_id
+      @process.environment['CI_RUNNER_ID'] = @runner_id
 
       @process.start
 
@@ -152,7 +192,7 @@ module GitlabCi
 
     def checkout_cmd
       cmd = []
-      cmd << "cd #{project_dir}"
+      cmd << "cd #{project_dir.shellescape}"
       cmd << "git reset --hard"
       cmd << "git checkout #{@ref}"
       cmd.join(" && ")
@@ -160,33 +200,43 @@ module GitlabCi
 
     def clone_cmd
       cmd = []
-      cmd << "cd #{config.builds_dir}"
-      cmd << "git clone #{@repo_url} project-#{@project_id}"
-      cmd << "cd project-#{@project_id}"
+      cmd << "rm -rf #{project_dir.shellescape}"
+      cmd << "mkdir -p #{builds_dir.shellescape}"
+      cmd << "cd #{builds_dir.shellescape}"
+      cmd << "git clone #{@repo_url.shellescape} #{project_dir_name.shellescape}"
+      cmd << "cd #{project_dir_name.shellescape}"
       cmd << "git checkout #{@ref}"
       cmd.join(" && ")
     end
 
     def fetch_cmd
       cmd = []
-      cmd << "cd #{project_dir}"
+      cmd << "cd #{project_dir.shellescape}"
       cmd << "git reset --hard"
       cmd << "git clean -fdx"
-      cmd << "git remote set-url origin #{@repo_url}"
+      cmd << "git remote set-url origin #{@repo_url.shellescape}"
       cmd << "git fetch origin"
       cmd.join(" && ")
-    end
-
-    def repo_exists?
-      File.exists?(File.join(project_dir, '.git'))
     end
 
     def config
       @config ||= Config.new
     end
 
+    def builds_dir
+      config.builds_dir
+    end
+
+    def project_dir_name
+      "project-#{@project_id}-job-#{@job_id}"
+    end
+    
     def project_dir
-      File.join(config.builds_dir, "project-#{@project_id}")
+      File.join(builds_dir, project_dir_name)
+    end
+
+    def project_build_script
+      File.join(config.scripts_dir, project_dir_name)
     end
   end
 end
