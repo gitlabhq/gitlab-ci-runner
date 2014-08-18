@@ -6,63 +6,66 @@
 # Required-Stop:     $local_fs $remote_fs $network $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: GitLab CI Runner init.d script
-# Description:       Enables automatic start of runners at boot time in the background.
+# Short-description: GitLab CI Runner init.d script
+# description:       Enables automatic start of runners at boot time in the background.
 ### END INIT INFO
 
-APP_ROOT="/home/gitlab_ci_runner/gitlab-ci-runner"
-APP_USER="gitlab_ci_runner"
-PID_PATH="$APP_ROOT/tmp/pids"
-PROCESS_NAME="ruby ./bin/runner"
-RUNNERS_PID="$PID_PATH/runners.pid"
-RUNNERS_NUM=1 # number of runners to spawn
-START_RUNNER="nohup bundle exec ./bin/runner"
-NAME="gitlab-ci-runner"
-DESC="GitLab CI runner"
-RUNNERS_REGISTERED=0
-RUNNERS_RUNNING=0
-INIT_LOG="/var/log/gitlab_ci_runner.log"
+app_root="/home/gitlab_ci_runner/gitlab-ci-runner"
+app_user="gitlab_ci_runner"
+pid_path="$app_root/tmp/pids"
+process_name="ruby ./bin/runner"
+process_pid="$pid_path/runners.pid"
+runners_num=1 # number of runners to spawn
+start_runner="nohup bundle exec ./bin/runner"
+name="gitlab-ci-runner"
+desc="GitLab CI runner"
+runners_registered=0
+runners_running=0
+init_log="/var/log/gitlab_ci_runner.log"
+
+# Read configuration variable file if it is present
+test -f /etc/default/gitlab_ci_runner && . /etc/default/gitlab_ci_runner
 
 check_pid() {
   # Number of registered runners in PID file
-  [ -f $RUNNERS_PID ] && RUNNERS_REGISTERED=`cat $RUNNERS_PID | wc -l`
+  [ -f $process_pid ] && runners_registered=`cat $process_pid | wc -l`
 
   # Number of active runner processes
-  RUNNERS_RUNNING=`ps -ef | grep "$PROCESS_NAME" | grep -v grep | wc -l`
+  runners_running=`ps -ef | grep "$process_name" | grep -v grep | wc -l`
 
 
-  echo "Number of registered runners in PID file=$RUNNERS_REGISTERED"
-  echo "Number of running runners=$RUNNERS_RUNNING"
+  echo "Number of registered runners in PID file=$runners_registered"
+  echo "Number of running runners=$runners_running"
 }
 
 execute() {
-  sudo -u $APP_USER -H bash -l -c "$1"
+  sudo -u $app_user -H bash -l -c "$1"
  }
 
 start() {
-  cd $APP_ROOT
+  cd $app_root
   check_pid
-  if [ "$RUNNERS_REGISTERED" -ne 0 -o "$RUNNERS_RUNNING" -ne 0 ]; then
+  if [ "$runners_registered" -ne 0 -o "$runners_running" -ne 0 ]; then
     # Program is running, Exit with error code.
-    echo "Error! $DESC(s) ($NAME) appear to be running already! Try stopping them first. Exiting."
+    echo "Error! $desc(s) ($name) appear to be running already! Try stopping them first. Exiting."
     exit 1
   else
     if [ `whoami` = root ]; then
-      [ ! -f $PID_PATH ] && execute "mkdir -p $PID_PATH"
-      [ -f $RUNNERS_PID ] && execute "rm -f $RUNNERS_PID"
+      [ ! -f $pid_path ] && execute "mkdir -p $pid_path"
+      [ -f $process_pid ] && execute "rm -f $process_pid"
 
       # Spawn runners
-      for (( i=1; i<=$RUNNERS_NUM; i++ ))
+      for (( i=1; i<=$runners_num; i++ ))
       do
         # Check log file
-        if [ ! -f $INIT_LOG ]; then
-          touch $INIT_LOG
-          chown $APP_USER $INIT_LOG
+        if [ ! -f $init_log ]; then
+          touch $init_log
+          chown $app_user $init_log
         fi
         echo "Starting runner #$i"
-        execute "$START_RUNNER  >> $INIT_LOG 2>&1 & echo \$! >> $RUNNERS_PID"
+        execute "$start_runner  >> $init_log 2>&1 & echo \$! >> $process_pid"
       done
-      echo "SUCCESS: Started $RUNNERS_NUM $DESC(s)."
+      echo "SUCCESS: Started $runners_num $desc(s)."
     fi
 
   fi
@@ -71,32 +74,32 @@ start() {
 stop() {
  check_pid
  # Exit if there are no runners
- if [ $RUNNERS_REGISTERED -eq 0 -a  $RUNNERS_RUNNING -eq 0 ]; then
+ if [ $runners_registered -eq 0 -a  $runners_running -eq 0 ]; then
    echo "No runners have been found. Exiting."
  fi
 
  # Runners found. Check if there are any ghost runners.
  KILL_GHOSTS=0;
- if [ $RUNNERS_REGISTERED -ne $RUNNERS_RUNNING ]; then
+ if [ $runners_registered -ne $runners_running ]; then
    echo "WARNING: Numbers of registered runners don't match number of running runners. Will try to stop them all"
-   echo "Registered runners=$RUNNERS_REGISTERED"
-   echo "Running runners=$RUNNERS_RUNNING"
+   echo "Registered runners=$runners_registered"
+   echo "Running runners=$runners_running"
    KILL_GHOSTS=1;
  fi
 
  echo -n "Trying to stop registered runners..."
- if [ $RUNNERS_REGISTERED -gt 0 ]; then
-   execute "cat $RUNNERS_PID | xargs kill -USR2"
-   rm -f $RUNNERS_PID
+ if [ $runners_registered -gt 0 ]; then
+   execute "cat $process_pid | xargs kill -USR2"
+   rm -f $process_pid
    echo "OK"
  else
    echo "FAILED!"
-   echo "Couldn't stop registered runners as there is no record of such in $RUNNERS_PID file".
+   echo "Couldn't stop registered runners as there is no record of such in $process_pid file".
  fi
 
  if [ $KILL_GHOSTS -eq 1 ]; then
    echo -ne "Trying to kill ghost runners..."
-   ps -C "$PROCESS_NAME" -o "%p" h | xargs kill -USR2
+   ps -C "$process_name" -o "%p" h | xargs kill -USR2
    [ $? -eq 0 ] && echo "OK"
  else
    echo "No ghost runners have been found.This is good."
@@ -116,24 +119,22 @@ fi
 
 case "$1" in
   start)
-        start
-        ;;
+    start
+    ;;
  stop)
-        stop
-        ;;
+    stop
+    ;;
   restart)
-        stop
-        start
-        ;;
+    stop
+    start
+    ;;
   status)
-        status
-        ;;
+    status
+    ;;
   *)
-        echo "Usage: sudo service gitlab_ci_runner {start|stop|restart|status}" >&2
-        exit 1
-        ;;
+    echo "Usage: sudo service gitlab_ci_runner {start|stop|restart|status}" >&2
+    exit 1
+    ;;
 esac
 
 exit 0
-
-

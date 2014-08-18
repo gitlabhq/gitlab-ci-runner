@@ -101,11 +101,12 @@ The registration token can be found at: <http://gitlab-ci-domain.com/admin/runne
 Place the init.d file:
 
 ```
-exit;
+exit
 cd /home/gitlab_ci_runner/gitlab-ci-runner
+sudo cp ./lib/support/init.d/gitlab_ci_runner.default.example /etc/default/gitlab_ci_runner
 sudo cp ./lib/support/init.d/gitlab_ci_runner /etc/init.d/gitlab-ci-runner
 sudo chmod +x /etc/init.d/gitlab-ci-runner
-sudo update-rc.d gitlab-ci-runner defaults 21 
+sudo update-rc.d gitlab-ci-runner defaults 21
 ```
 
 
@@ -129,7 +130,7 @@ bundle exec ./bin/runner
 
 ### Update
 
-In order to update the runner to a new version just go to runner directory and do next: 
+In order to update the runner to a new version just go to runner directory and do next:
 
 ```bash
 sudo su gitlab_ci_runner
