@@ -25,7 +25,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # Update your packages and install the ones that are needed to compile Ruby
 RUN apt-get update -y
-#RUN apt-get install -y wget curl gcc libxml2-dev libxslt-dev libcurl4-openssl-dev libreadline6-dev libc6-dev libssl-dev make build-essential zlib1g-dev openssh-server git-core libyaml-dev postfix libpq-dev libicu-dev
+RUN apt-get upgrade -y
 RUN apt-get install -y curl libxml2-dev libxslt-dev libcurl4-openssl-dev libreadline6-dev libssl-dev patch build-essential zlib1g-dev openssh-server libyaml-dev libicu-dev
 
 # Download Ruby and compile it
