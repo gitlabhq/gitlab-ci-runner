@@ -25,7 +25,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # Update your packages and install the ones that are needed to compile Ruby
 RUN apt-get update -y
-RUN apt-get upgrade -y
+#RUN apt-get install -y wget curl gcc libxml2-dev libxslt-dev libcurl4-openssl-dev libreadline6-dev libc6-dev libssl-dev make build-essential zlib1g-dev openssh-server git-core libyaml-dev postfix libpq-dev libicu-dev
 RUN apt-get install -y curl libxml2-dev libxslt-dev libcurl4-openssl-dev libreadline6-dev libssl-dev patch build-essential zlib1g-dev openssh-server libyaml-dev libicu-dev
 
 # Download Ruby and compile it
@@ -52,3 +52,27 @@ WORKDIR /gitlab-ci-runner.git
 
 # When the image is started add the remote server key, set up the runner and run it
 CMD ssh-keyscan -H $GITLAB_SERVER_FQDN >> /root/.ssh/known_hosts && bundle exec ./bin/setup_and_run
+
+# Optional dependencies
+#
+# Install packages commonly required to test Rails projects before the test run starts
+# If they are not here you have to add them to the test script in the project settings
+# RUN apt-get install -y libqtwebkit-dev # test with capybara
+# RUN apt-get install -y sqlite3 libsqlite3-dev # sqlite is the default datastore
+# RUN apt-get install -y libmysqlclient-dev # native extensions for the mysql2 gem
+# RUN apt-get install -q -y mysql-server # install MySQL with blank root password
+# RUN cd /root && wget http://download.redis.io/redis-stable.tar.gz && tar xvzf redis-stable.tar.gz && cd redis-stable && make
+#
+# Install PostgreSQL, after install this should work: psql --host=127.0.0.1 roottestdb
+# RUN apt-get install -y postgresql
+# RUN cat /dev/null > /etc/postgresql/9.3/main/pg_hba.conf
+# RUN echo "# TYPE DATABASE USER ADDRESS METHOD" >> /etc/postgresql/9.3/main/pg_hba.conf
+# RUN echo "local  all  all  trust" >> /etc/postgresql/9.3/main/pg_hba.conf
+# RUN echo "host all all 127.0.0.1/32 trust" >> /etc/postgresql/9.3/main/pg_hba.conf
+# RUN echo "host all all  ::1/128 trust" >> /etc/postgresql/9.3/main/pg_hba.conf
+# RUN /etc/init.d/postgresql start && su postgres -c "psql -c \"create user root;\"" && su postgres -c "psql -c \"alter user root createdb;\"" && su postgres -c "psql -c \"create database roottestdb owner root;\""
+#
+# When the image is started add the remote server key, set up the runner and run it
+# WORKDIR /gitlab-ci-runner.git
+#
+# CMD ssh-keyscan -H $GITLAB_SERVER_FQDN >> /root/.ssh/known_hosts && mysqld & /root/redis-stable/src/redis-server & /etc/init.d/postgresql start & bundle exec ./bin/setup_and_run
