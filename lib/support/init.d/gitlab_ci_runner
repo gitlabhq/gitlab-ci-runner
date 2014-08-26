@@ -36,7 +36,7 @@ check_pid() {
 }
 
 execute() {
-  sudo -u $APP_USER -H bash -l -c "$1"
+  su $APP_USER -s /bin/bash -c "$1"
  }
 
 start() {
