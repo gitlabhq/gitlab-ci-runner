@@ -96,10 +96,10 @@ stop() {
 
  if [ $KILL_GHOSTS -eq 1 ]; then
    echo -ne "Trying to kill ghost runners..."
-   ps -C "$PROCESS_NAME" -o "%p" h | xargs kill -USR2
+   ps -C "$PROCESS_NAME" -o "%p" h | xargs -r kill -USR2
    [ $? -eq 0 ] && echo "OK"
  else
-   echo "No ghost runners have been found.This is good."
+   echo "No ghost runners have been found. This is good."
  fi
 }
 
