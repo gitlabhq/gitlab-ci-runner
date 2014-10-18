@@ -76,7 +76,10 @@ module GitlabCi
 
     def register_runner(token)
       body = {
-        token: token
+        token: token,
+        hostname: config.hostname,
+        os: config.os,
+        images: config.images
       }
 
       opts = {

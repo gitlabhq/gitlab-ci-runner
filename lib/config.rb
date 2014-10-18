@@ -1,4 +1,5 @@
 require 'yaml'
+require 'socket'
 
 ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), ".."))
 
@@ -36,6 +37,12 @@ module GitlabCi
           else
             'unknown'
         end
+      end
+    end
+
+    def hostname
+      @config.fetch('hostname') do
+        Socket.gethostname
       end
     end
 
