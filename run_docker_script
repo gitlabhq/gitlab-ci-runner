@@ -32,11 +32,14 @@ if [[ "$CI_BUILD_OS" != "linux" ]]; then
     exit 1
 fi
 
+CI_DEFAULT_BUILD_IMAGE="ayufan/gitlab-ci-worker:latest"
+
 BUILD_CACHE="${CI_BUILD_METHOD}_cache_${CI_PROJECT_ID}_job_${CI_BUILD_JOB_ID}"
+BUILD_IMAGE="${CI_BUILD_IMAGE:-$CI_DEFAULT_BUILD_IMAGE}"
 
 case "$CI_BUILD_METHOD" in
     travis)
-        case "$CI_BUILD_IMAGE" in
+        case "$BUILD_IMAGE" in
         ayufan/travis_linux_worker:android)
             VOLUME_OPTS="-v /home/travis/.gradle -v /home/travis/.android/cache -v /home/travis/.cache"
             VOLUME_CMD="chown 1000:1000 /home/travis/.gradle /home/travis/.android/cache /home/travis/.cache"
@@ -80,7 +83,7 @@ case "$CI_BUILD_METHOD" in
             exit 1
         fi
 
-        id=$(docker run --volumes-from="$BUILD_CACHE" --env-file=<(emit_env_vars) -d "$CI_BUILD_IMAGE" /sbin/init)
+        id=$(docker run --volumes-from="$BUILD_CACHE" --env-file=<(emit_env_vars) -d "$BUILD_IMAGE" /sbin/init)
         trap stop_docker EXIT
 
         IMAGE_USER="travis"
@@ -109,7 +112,7 @@ case "$CI_BUILD_METHOD" in
         travis_fold end "virtual-machine"
 
         echo "Running build script..."
-        docker run --rm -i --volumes-from="$BUILD_CACHE" --env-file=<(emit_env_vars) "$CI_BUILD_IMAGE" /bin/bash --login < "$1"
+        docker run --rm -i --volumes-from="$BUILD_CACHE" --env-file=<(emit_env_vars) "$BUILD_IMAGE" /bin/bash --login < "$1"
         ;;
 esac
 
