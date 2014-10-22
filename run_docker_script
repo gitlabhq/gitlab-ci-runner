@@ -40,7 +40,7 @@ BUILD_IMAGE="${CI_BUILD_IMAGE:-$CI_DEFAULT_BUILD_IMAGE}"
 case "$CI_BUILD_METHOD" in
     travis)
         case "$BUILD_IMAGE" in
-        ayufan/travis_linux_worker:android)
+        "ayufan/travis_linux_worker:android")
             VOLUME_OPTS="-v /home/travis/.gradle -v /home/travis/.android/cache -v /home/travis/.cache"
             VOLUME_CMD="chown 1000:1000 /home/travis/.gradle /home/travis/.android/cache /home/travis/.cache"
             ;;

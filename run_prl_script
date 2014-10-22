@@ -142,7 +142,7 @@ wait_for_ssh() {
 
 IP=""
 get_ip_addr
-PORT="22"
+PORT="50111"
 SSH_COMMAND="sshpass -p $CUR_USER ssh -p $PORT -o ConnectionAttempts=10 -o ConnectTimeout=10 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 SSH_LOGIN="$CUR_USER@$IP"
 
