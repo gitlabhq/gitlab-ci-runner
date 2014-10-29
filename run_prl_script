@@ -19,6 +19,11 @@ if [[ -z "$CI_RUNNER_ID" ]]; then
     exit 1
 fi
 
+if [[ -z "$CI_BUILD_IMAGE" ]]; then
+    echo "$CI_BUILD_IMAGE not defined"
+    exit 1
+fi
+
 travis_fold() {
       local action=$1
       local name=$2
@@ -68,20 +73,12 @@ travis_fold start "virtual-machine"
 echo "Provisioning Virtual Machine..."
 set -x
 
-case "$CI_BUILD_OS" in
-osx)
-    BASE_VM=Mavericks
-    ;;
-
-*)
-    fail "$2 is currently not supported"
-    ;;
-esac
-
+BASE_VM="${CI_BUILD_IMAGE}"
 BASE_TEMPLATE="${BASE_VM}_template"
 CUR_VM="${BASE_VM}_runner_${CI_RUNNER_ID}"
 CUR_SNAPSHOT="started"
 CUR_USER="travis"
+CUR_IDENTITY="$(dirname "$0")/lib/support/ssh/travis"
 
 trap interrupt_vm INT
 
@@ -140,17 +137,14 @@ wait_for_ssh() {
     return 1
 }
 
+# fix key permissions
+chmod 0600 "$CUR_IDENTITY"
+
 IP=""
 get_ip_addr
 PORT="50111"
-SSH_COMMAND="sshpass -p $CUR_USER ssh -p $PORT -o ConnectionAttempts=10 -o ConnectTimeout=10 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+SSH_COMMAND="ssh -i $(printf "%q" "$CUR_IDENTITY") -p $PORT -o ConnectionAttempts=10 -o ConnectTimeout=10 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 SSH_LOGIN="$CUR_USER@$IP"
-
-if ! which sshpass >/dev/null
-then
-    echo "Installing sshpass..."
-    brew install https://raw.github.com/eugeneoden/homebrew/eca9de1/Library/Formula/sshpass.rb
-fi
 
 echo "Waiting for container boot-up: $IP:$PORT..."
 wait_for_ssh
