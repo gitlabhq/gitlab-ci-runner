@@ -7,6 +7,12 @@ module GitlabCi
   class Network
     include HTTParty
 
+    attr_accessor :config
+
+    def initialize(config)
+      @config = config
+    end
+
     # check for available build from coordinator
     # and pick a pending one
     # {
@@ -111,7 +117,7 @@ module GitlabCi
     end
 
     def config
-      @config ||= Config.new
+      @config
     end
 
     def default_options

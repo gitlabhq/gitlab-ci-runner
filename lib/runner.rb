@@ -10,6 +10,9 @@ module GitlabCi
       puts '* Gitlab CI Runner started'
       puts '* Waiting for builds'
       loop do
+        if config.reload
+          puts "#{Time.now.to_s} | Configuration reloaded."
+        end
         check_workers
         check_for_new_builds if workers.count < config.workers
         sleep 5
@@ -123,7 +126,7 @@ module GitlabCi
     end
 
     def network
-      @network ||= Network.new
+      @network ||= Network.new(config)
     end
 
     def run(build_data)

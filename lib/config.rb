@@ -10,8 +10,23 @@ module GitlabCi
     def initialize
       if File.exists?(config_path)
         @config = YAML.load_file(config_path)
+        @mtime = File.mtime(config_path)
       else
         @config = {}
+        @mtime = Time.at(0)
+      end
+    end
+
+    def reload
+      begin
+        if File.exists?(config_path)
+          new_mtime = File.mtime(config_path)
+          return false unless @mtime < new_mtime
+          @config = YAML.load_file(config_path)
+          @mtime = new_mtime
+        end
+      rescue => e
+        puts("Exception during file reload: #{e.to_s}")
       end
     end
 

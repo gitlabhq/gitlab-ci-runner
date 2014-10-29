@@ -33,7 +33,7 @@ module GitlabCi
         end
 
         puts "Registering runner with registration token: #{token}, url: #{config.url}."
-        runner = Network.new.register_runner(token)
+        runner = Network.new(config).register_runner(token)
 
         if runner
           write_token(runner[:token])
