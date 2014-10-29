@@ -55,6 +55,14 @@ module GitlabCi
       end
     end
 
+    def worker_update
+      @config['worker_update'] || 5
+    end
+
+    def build_update
+      @config['build_update'] || 3
+    end
+
     def hostname
       @config.fetch('hostname') do
         Socket.gethostname

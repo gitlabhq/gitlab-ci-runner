@@ -15,7 +15,7 @@ module GitlabCi
         end
         check_workers
         check_for_new_builds if workers.count < config.workers
-        sleep 5
+        sleep config.worker_update
       end
     end
 
@@ -49,6 +49,7 @@ module GitlabCi
         end
       end
     end
+
     def update_died_build(id)
       return unless id
       case network.update_build(id, :failed, "Worker died")
@@ -61,7 +62,6 @@ module GitlabCi
       end
     end
 
-
     def run_build(build_data)
       run(build_data)
       loop do
@@ -69,7 +69,7 @@ module GitlabCi
           abort_if_timeout
           push_build
           update_build
-          sleep 3
+          sleep config.build_update
         else
           break
         end
