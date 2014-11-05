@@ -1,0 +1,90 @@
+#!/bin/bash
+
+set -e
+
+if [[ $# -ne 1 ]]; then
+	echo "Usage: $0 <script>"
+	exit 1
+fi
+
+cp $1 current_build_script || true
+
+CI_PROJECT_ID="${CI_PROJECT_ID:-10}"
+
+BASE_VM="Mavericks"
+BASE_SNAPSHOT="Active"
+CUR_VM="${BASE_VM}_project_${CI_PROJECT_ID}"
+CUR_SSH_PORT=$((2222+$CI_PROJECT_ID))
+CUR_SNAPSHOT="Started"
+SSH_COMMAND="ssh -p $CUR_SSH_PORT -o ConnectionAttempts=10 -o ConnectTimeout=10 -o IdentityFile=$HOME/.vagrant.d/insecure_private_key -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no vagrant@127.0.0.1"
+
+wait_for_ssh() {
+	for i in $(seq 1 10)
+	do
+		$SSH_COMMAND exit 0 && return 0
+		echo "Waiting for SSH ($i)..."
+		sleep 3s
+	done
+	return 1
+}
+
+pause_vm() {
+	VBoxManage controlvm "$CUR_VM" savestate 2>/dev/null || true
+}
+
+poweroff_vm() {
+	VBoxManage controlvm "$CUR_VM" poweroff 2>/dev/null || true
+}
+
+delete_vm() {
+	poweroff_vm
+	VBoxManage unregistervm "$CUR_VM" --delete || true
+	exit 0
+}
+
+interrupt_vm() {
+	exit 1
+}
+
+trap interrupt_vm INT
+
+if ! VBoxManage showvminfo "$CUR_VM" 2>/dev/null 1>/dev/null
+then
+	echo "Bootstraping new $BASE_VM..."
+	VBoxManage clonevm "$BASE_VM" --snapshot "$BASE_SNAPSHOT" --name "$CUR_VM" --options link --register
+	trap delete_vm EXIT
+	VBoxManage modifyvm "$CUR_VM" --natpf1 "ssh,tcp,,$CUR_SSH_PORT,,22"
+	VBoxManage startvm "$CUR_VM" --type headless
+	wait_for_ssh
+	VBoxManage snapshot "$CUR_VM" take "$CUR_SNAPSHOT" --live
+	if [[ "$CI_ALLOW_GIT_FETCH" != "" ]]; then
+		trap pause_vm EXIT
+	else
+		trap poweroff_vm EXIT
+	fi
+else
+	if [[ "$CI_ALLOW_GIT_FETCH" != "" ]]; then
+		if ! VBoxManage list runningvms | grep -q "^\"$CUR_VM\" "
+		then
+			echo "Loading state of $CUR_VM..."
+			pause_vm
+			VBoxManage startvm "$CUR_VM" --type headless
+			trap pause_vm EXIT
+		fi
+	else
+		echo "Restoring state of $CUR_VM..."
+		poweroff_vm
+		VBoxManage snapshot "$CUR_VM" restorecurrent
+		VBoxManage startvm "$CUR_VM" --type headless
+		trap poweroff_vm EXIT
+	fi
+	wait_for_ssh
+fi
+
+echo ""
+echo ""
+echo "Starting building..."
+echo ""
+echo ""
+
+$SSH_COMMAND bash --login - < $1

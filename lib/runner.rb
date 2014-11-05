@@ -1,5 +1,6 @@
 require_relative 'build'
 require_relative 'network'
+require_relative 'workers'
 
 module GitlabCi
   class Runner
@@ -9,14 +10,12 @@ module GitlabCi
       puts '* Gitlab CI Runner started'
       puts '* Waiting for builds'
       loop do
-        if running?
-          abort_if_timeout
-          push_build
-          update_build
-        else
-          get_build
+        if config.reload
+          puts "#{Time.now.to_s} | Configuration reloaded."
         end
-        sleep 5
+        check_workers
+        check_for_new_builds if workers.count < config.workers
+        sleep config.worker_update
       end
     end
 
@@ -29,6 +28,66 @@ module GitlabCi
     def abort_if_timeout
       if @current_build.running? && @current_build.running_too_long?
         @current_build.timeout_abort
+      end
+    end
+
+    def check_workers
+      workers.pids.dup.each do |worker, build_data|
+        begin
+          if Process.waitpid(worker, Process::WNOHANG)
+            workers.remove_worker(worker)
+            puts "#{Time.now.to_s} | Worker finished [pid:#{worker}, running:#{workers.count}]"
+          end
+        rescue
+          if config.restart_job_on_die
+            start_build(build_data)
+          else
+            return unless update_died_build(build_data[:id])
+          end
+          puts "#{Time.now.to_s} | Worker died [pid:#{worker}, running:#{workers.count}]"
+          workers.remove_worker(worker)
+        end
+      end
+    end
+
+    def update_died_build(id)
+      return unless id
+      case network.update_build(id, :failed, "Worker died")
+        when :success
+          true
+        when :aborted
+          true
+        when :failure
+          false
+      end
+    end
+
+    def run_build(build_data)
+      run(build_data)
+      loop do
+        if running?
+          abort_if_timeout
+          push_build
+          update_build
+          sleep config.build_update
+        else
+          break
+        end
+      end
+    end
+
+    def start_build(build_data)
+      build_data[:runner_id] = workers.next_runner_id
+      new_worker = fork do
+        run_build(build_data)
+      end
+      workers.add_worker(new_worker, build_data)
+      puts "#{Time.now.to_s} | New worker created [pid:#{new_worker}, running:#{workers.count}]"
+    end
+
+    def check_for_new_builds
+      get_build do |build_data|
+        start_build(build_data)
       end
     end
 
@@ -60,17 +119,14 @@ module GitlabCi
       end
     end
 
-    def get_build
+    def get_build(&block)
+      raise 'block must be specified' unless block_given?
       build_data = network.get_build
-      if build_data
-        run(build_data)
-      else
-        false
-      end
+      block.call(build_data) if build_data
     end
 
     def network
-      @network ||= Network.new
+      @network ||= Network.new(config)
     end
 
     def run(build_data)
@@ -81,7 +137,15 @@ module GitlabCi
     end
 
     def collect_trace
-      @current_build.trace
+      @current_build.collect_trace
+    end
+
+    def config
+      @config ||= Config.new
+    end
+
+    def workers
+      @workers ||= Workers.new
     end
   end
 end

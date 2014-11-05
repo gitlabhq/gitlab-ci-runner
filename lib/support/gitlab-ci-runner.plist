@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>RunAtLoad</key>  
+        <true/>
+        <key>KeepAlive</key>
+        <true/>
+        <key>Label</key>
+        <string>gitlab-ci-runner.restart</string>
+        <key>WorkingDirectory</key>
+        <string>$HOME/gitlab-ci-runner</string>
+        <key>ProgramArguments</key>
+        <array>
+                <string>bundle</string>
+                <string>exec</string>
+                <string>bin/runner</string>
+        </array>
+        <key>StandardErrorPath</key>
+        <string>gitlab-ci-runner.stderr</string>
+        <key>StandardOutPath</key>
+        <string>gitlab-ci-runner.stdout</string>
+</dict>
+</plist>
