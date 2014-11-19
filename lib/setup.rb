@@ -14,7 +14,7 @@ module GitlabCi
     def build_config
       url = ENV['CI_SERVER_URL']
       unless url
-        puts 'Please enter the gitlab-ci coordinator URL (e.g. http://gitlab-ci.org:3000/ )'
+        puts 'Please enter the gitlab-ci coordinator URL (e.g. http://gitlab-ci.org/ )'
         url = gets.chomp
       end
 
