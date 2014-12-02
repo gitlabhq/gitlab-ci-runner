@@ -1,5 +1,6 @@
 require_relative 'build'
 require_relative 'network'
+require_relative 'config'
 
 module GitlabCi
   class Runner
@@ -41,6 +42,10 @@ module GitlabCi
       if push_build
         @current_build.cleanup
         @current_build = nil
+        if config.post_build_cmd
+            puts "Running post_build_cmd: #{config.post_build_cmd}"
+            system(config.post_build_cmd)
+        end
       else
         # wait when ci server will be online again to submit build results
       end
@@ -82,6 +87,10 @@ module GitlabCi
 
     def collect_trace
       @current_build.trace
+    end
+
+    def config
+        @config ||= Config.new
     end
   end
 end

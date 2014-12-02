@@ -14,6 +14,10 @@ module GitlabCi
       end
     end
 
+    def post_build_cmd
+      @config['post_build_cmd']
+    end
+
     def token
       @config['token']
     end
