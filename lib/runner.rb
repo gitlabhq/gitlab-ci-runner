@@ -43,8 +43,8 @@ module GitlabCi
         @current_build.cleanup
         @current_build = nil
         if config.post_build_cmd
-            puts "Running post_build_cmd: #{config.post_build_cmd}"
-            system(config.post_build_cmd)
+          puts "Running post_build_cmd: #{config.post_build_cmd}"
+          system(config.post_build_cmd)
         end
       else
         # wait when ci server will be online again to submit build results
@@ -90,7 +90,7 @@ module GitlabCi
     end
 
     def config
-        @config ||= Config.new
+      @config ||= Config.new
     end
   end
 end
