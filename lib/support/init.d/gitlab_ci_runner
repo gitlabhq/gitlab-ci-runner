@@ -106,6 +106,7 @@ stop() {
 status() {
   echo "Here is what we have at the moment:"
   check_pid
+  exit [ $RUNNERS_RUNNING -gt 0 ]
 }
 
 ## Check to see if we are running as root first.
