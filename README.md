@@ -97,8 +97,16 @@ CI_SERVER_URL=https://ci.example.com REGISTRATION_TOKEN=replaceme bundle exec ./
 
 The registration token can be found at: <http://gitlab-ci-domain.com/admin/runners>, accessible through Header > Runners.
 
+#### Create an Upstart job (Ubuntu, Centos 6)
 
-Place the init.d file:
+```
+exit;
+cd /home/gitlab_ci_runner/gitlab-ci-runner
+sudo cp ./lib/support/upstart/gitlab-ci-runner.conf /etc/init.d/
+```
+
+
+#### Set up an init.d script (other distributions)
 
 ```
 exit;
@@ -111,7 +119,7 @@ sudo update-rc.d gitlab-ci-runner defaults 21
 
 ### Run
 
-Using the system service with init.d script:
+Using the system service with Upstart/init.d script:
 
 ```bash
 sudo service gitlab-ci-runner start
