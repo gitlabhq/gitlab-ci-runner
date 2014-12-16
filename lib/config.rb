@@ -18,6 +18,10 @@ module GitlabCi
       @config['post_build_cmd']
     end
 
+    def pre_build_cmd
+      @config['pre_build_cmd']
+    end
+
     def token
       @config['token']
     end
