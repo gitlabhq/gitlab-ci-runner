@@ -31,6 +31,7 @@ module GitlabCi
       if config.pre_build_cmd
         puts "Executing pre_build_cmd: #{config.pre_build_cmd}"
         system(config.pre_build_cmd) 
+      end
 
       @run_file = Tempfile.new("executor")
       @run_file.chmod(0700)
