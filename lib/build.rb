@@ -25,14 +25,15 @@ module GitlabCi
       @before_sha = data[:before_sha]
       @timeout = data[:timeout] || TIMEOUT
       @allow_git_fetch = data[:allow_git_fetch]
-      @pre_build_cmd = config.pre_build_cmd
     end
 
     def run
+      puts "Executing pre_build_cmd: #{config.pre_build_cmd}"
+      system(config.pre_build_cmd) 
+
       @run_file = Tempfile.new("executor")
       @run_file.chmod(0700)
 
-      @commands.unshift(pre_build_cmd)
       @commands.unshift(checkout_cmd)
 
       if repo_exists? && @allow_git_fetch
