@@ -42,7 +42,7 @@ execute() {
 start() {
   cd $APP_ROOT
   check_pid
-  if [ "$RUNNERS_REGISTERED" -ne 0 -o "$RUNNERS_RUNNING" -ne 0 ]; then
+  if [ "$RUNNERS_REGISTERED" -ne 0 -a "$RUNNERS_RUNNING" -ne 0 ]; then
     # Program is running, Exit with error code.
     echo "Error! $DESC(s) ($NAME) appear to be running already! Try stopping them first. Exiting."
     exit 1
