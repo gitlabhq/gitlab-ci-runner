@@ -25,6 +25,7 @@ INIT_LOG="/var/log/gitlab_ci_runner.log"
 
 check_pid() {
   # Number of registered runners in PID file
+  RUNNERS_REGISTERED=0
   [ -f $RUNNERS_PID ] && RUNNERS_REGISTERED=`cat $RUNNERS_PID | wc -l`
 
   # Number of active runner processes
