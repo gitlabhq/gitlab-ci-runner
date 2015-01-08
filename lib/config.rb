@@ -1,6 +1,9 @@
 require 'yaml'
+require 'optparse'
 
-ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), ".."))
+# The default root path is the path where the gitlab-ci-runner source got
+# installed. This may be overridden by the OptionParser below.
+$root_path = File.expand_path(File.join(File.dirname(__FILE__), ".."))
 
 module GitlabCi
   class Config
@@ -23,7 +26,7 @@ module GitlabCi
     end
 
     def builds_dir
-      @builds_path ||= File.join(ROOT_PATH, 'tmp', 'builds')
+      @builds_path ||= File.join($root_path, 'tmp', 'builds')
     end
 
     def write(key, value)
@@ -37,7 +40,13 @@ module GitlabCi
     private
 
     def config_path
-      File.join(ROOT_PATH, 'config.yml')
+      File.join($root_path, 'config.yml')
     end
   end
 end
+
+OptionParser.new do |opts|
+  opts.on('-CWORKING_DIRECTORY', 'Specify the working directory for gitlab-ci-runner') do |v|
+    $root_path = File.expand_path(v)
+  end
+end.parse!

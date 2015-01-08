@@ -97,6 +97,13 @@ CI_SERVER_URL=https://ci.example.com REGISTRATION_TOKEN=replaceme bundle exec ./
 
 The registration token can be found at: <http://gitlab-ci-domain.com/admin/runners>, accessible through Header > Runners.
 
+By default the configuration file for your new runner gets written in the directory where the gitlab-ci-runner source code was installed, e.g. in `/home/gitlab_ci_runner/gitlab-ci-runner/config.yml`.
+You can tell `bin/setup` to use a different directory with the `-C` switch.
+
+```
+bin/setup -C /my/runner/working/directory
+```
+
 #### Create an Upstart job (Ubuntu, Centos 6)
 
 ```
@@ -133,6 +140,13 @@ Manually:
 sudo su gitlab_ci_runner
 cd /home/gitlab_ci_runner/gitlab-ci-runner
 bundle exec ./bin/runner
+```
+
+If you are using a custom working directory you can tell the runner about it with the `-C` switch.
+The default working directory is the directory where the gitlab-ci-runner source code was installed, e.g. `/home/gitlab_ci_runner/gitlab-ci-runner`.
+
+```
+bundle exec bin/runner -C /my/runner/working/directory
 ```
 
 ### Update

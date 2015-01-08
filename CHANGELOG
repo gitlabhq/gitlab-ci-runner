@@ -1,3 +1,6 @@
+v5.1.0
+  - Add `-C` command-line option to specify the working directory
+
 v5.0.0
   - Async command execution
   - All commands executed as single bash script from tempfile
