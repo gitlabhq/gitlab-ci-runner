@@ -174,3 +174,8 @@ To quickly add a runner, have the registration token at hand and:
 - `sudo service gitlab-ci-runner start`
 
 Now the runner will start to pick up builds automatically. When you are done with it, you can destroy the VPS without worrying about anything. For testing GitLab itself, use of a runner with >= 2GB RAM is recommended.
+
+## Development
+
+To work on the GitLab runner we recommend you install the [GitLab Development Kit](https://gitlab.com/gitlab-org/gitlab-development-kit).
+
