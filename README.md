@@ -109,7 +109,7 @@ bin/setup -C /my/runner/working/directory
 ```
 exit;
 cd /home/gitlab_ci_runner/gitlab-ci-runner
-sudo cp ./lib/support/upstart/gitlab-ci-runner.conf /etc/init.d/
+sudo cp ./lib/support/upstart/gitlab-ci-runner.conf /etc/init/
 ```
 
 
