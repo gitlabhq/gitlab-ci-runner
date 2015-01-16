@@ -25,11 +25,22 @@ INIT_LOG="/var/log/gitlab_ci_runner.log"
 
 check_pid() {
   # Number of registered runners in PID file
-  [ -f $RUNNERS_PID ] && RUNNERS_REGISTERED=`cat $RUNNERS_PID | wc -l`
+  RUNNERS_REGISTERED=0
+  # Number of active runner processes from PID file
+  RUNNERS_RUNNING=0
 
-  # Number of active runner processes
-  RUNNERS_RUNNING=`ps -ef | grep "$PROCESS_NAME" | grep -v grep | wc -l`
+  if [ -f $RUNNERS_PID ]; then
+    # Registered
+    RUNNERS_REGISTERED=`cat $RUNNERS_PID | wc -l`
 
+    # Running
+    while read pid; do
+      if [ -d /proc/$pid ]; then
+        # Process is running
+        ((RUNNERS_RUNNING++))
+      fi
+    done < $RUNNERS_PID
+  fi
 
   echo "Number of registered runners in PID file=$RUNNERS_REGISTERED"
   echo "Number of running runners=$RUNNERS_RUNNING"
@@ -37,7 +48,7 @@ check_pid() {
 
 execute() {
   sudo -u $APP_USER -H bash -l -c "$1"
- }
+}
 
 start() {
   cd $APP_ROOT
@@ -59,48 +70,49 @@ start() {
           touch $INIT_LOG
           chown $APP_USER $INIT_LOG
         fi
+       
         echo "Starting runner #$i"
         execute "$START_RUNNER  >> $INIT_LOG 2>&1 & echo \$! >> $RUNNERS_PID"
       done
+      
       echo "SUCCESS: Started $RUNNERS_NUM $DESC(s)."
     fi
-
   fi
 }
 
 stop() {
- check_pid
- # Exit if there are no runners
- if [ $RUNNERS_REGISTERED -eq 0 -a  $RUNNERS_RUNNING -eq 0 ]; then
-   echo "No runners have been found. Exiting."
- fi
+  check_pid
+  # Exit if there are no runners
+  if [ $RUNNERS_REGISTERED -eq 0 -a  $RUNNERS_RUNNING -eq 0 ]; then
+    echo "No runners have been found. Exiting."
+  fi
 
- # Runners found. Check if there are any ghost runners.
- KILL_GHOSTS=0;
- if [ $RUNNERS_REGISTERED -ne $RUNNERS_RUNNING ]; then
-   echo "WARNING: Numbers of registered runners don't match number of running runners. Will try to stop them all"
-   echo "Registered runners=$RUNNERS_REGISTERED"
-   echo "Running runners=$RUNNERS_RUNNING"
-   KILL_GHOSTS=1;
- fi
+  # Runners found. Check if there are any ghost runners.
+  KILL_GHOSTS=0;
+  if [ $RUNNERS_REGISTERED -ne $RUNNERS_RUNNING ]; then
+    echo "WARNING: Numbers of registered runners don't match number of running runners. Will try to stop them all"
+    echo "Registered runners=$RUNNERS_REGISTERED"
+    echo "Running runners=$RUNNERS_RUNNING"
+    KILL_GHOSTS=1;
+  fi
 
- echo -n "Trying to stop registered runners..."
- if [ $RUNNERS_REGISTERED -gt 0 ]; then
-   execute "cat $RUNNERS_PID | xargs kill -USR2"
-   rm -f $RUNNERS_PID
-   echo "OK"
- else
-   echo "FAILED!"
-   echo "Couldn't stop registered runners as there is no record of such in $RUNNERS_PID file".
- fi
+  echo -n "Trying to stop registered runners..."
+  if [ $RUNNERS_REGISTERED -gt 0 ]; then
+    execute "cat $RUNNERS_PID | xargs kill -USR2"
+    rm -f $RUNNERS_PID
+    echo "OK"
+  else
+    echo "FAILED!"
+    echo "Couldn't stop registered runners as there is no record of such in $RUNNERS_PID file".
+  fi
 
- if [ $KILL_GHOSTS -eq 1 ]; then
-   echo -ne "Trying to kill ghost runners..."
-   ps -C "$PROCESS_NAME" -o "%p" h | xargs kill -USR2
-   [ $? -eq 0 ] && echo "OK"
- else
-   echo "No ghost runners have been found.This is good."
- fi
+  if [ $KILL_GHOSTS -eq 1 ]; then
+    echo -ne "Trying to kill ghost runners..."
+    ps -C "$PROCESS_NAME" -o "%p" h | xargs kill -USR2
+    [ $? -eq 0 ] && echo "OK"
+  else
+    echo "No ghost runners have been found.This is good."
+  fi
 }
 
 status() {
@@ -110,30 +122,28 @@ status() {
 
 ## Check to see if we are running as root first.
 if [ "$(id -u)" != "0" ]; then
-    echo "This script must be run as root"
-    exit 1
+  echo "This script must be run as root"
+  exit 1
 fi
 
 case "$1" in
   start)
-        start
-        ;;
- stop)
-        stop
-        ;;
+    start
+    ;;
+  stop)
+    stop
+    ;;
   restart)
-        stop
-        start
-        ;;
+    stop
+    start
+    ;;
   status)
-        status
-        ;;
+    status
+    ;;
   *)
-        echo "Usage: sudo service gitlab_ci_runner {start|stop|restart|status}" >&2
-        exit 1
-        ;;
+    echo "Usage: sudo service gitlab_ci_runner {start|stop|restart|status}" >&2
+    exit 1
+    ;;
 esac
 
 exit 0
-
-
