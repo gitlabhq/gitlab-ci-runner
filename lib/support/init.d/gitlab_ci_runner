@@ -21,7 +21,8 @@ NAME="gitlab-ci-runner"
 DESC="GitLab CI runner"
 RUNNERS_REGISTERED=0
 RUNNERS_RUNNING=0
-INIT_LOG="/var/log/gitlab_ci_runner.log"
+INIT_LOG='/var/log/gitlab_ci_runner.log'
+#INIT_LOG='/var/log/gitlab_ci_runner_$RUNNER.log'
 
 check_pid() {
   # Number of registered runners in PID file
@@ -54,13 +55,16 @@ start() {
       # Spawn runners
       for (( i=1; i<=$RUNNERS_NUM; i++ ))
       do
+	# eval is required for making dedicated logs for each logger. Then use $RUNNER substitution in INIT_LOG variable
+	RUNNER=$((i-1))
+	eval "LOGFILE=\"$INIT_LOG\""
         # Check log file
-        if [ ! -f $INIT_LOG ]; then
-          touch $INIT_LOG
-          chown $APP_USER $INIT_LOG
+        if [ ! -f $LOGFILE ]; then
+          touch $LOGFILE
+          chown $APP_USER $LOGFILE
         fi
         echo "Starting runner #$i"
-        execute "$START_RUNNER  >> $INIT_LOG 2>&1 & echo \$! >> $RUNNERS_PID"
+        execute "$START_RUNNER $i >> $LOGFILE 2>&1 & echo \$! >> $RUNNERS_PID"
       done
       echo "SUCCESS: Started $RUNNERS_NUM $DESC(s)."
     fi
@@ -99,7 +103,7 @@ stop() {
    ps -C "$PROCESS_NAME" -o "%p" h | xargs kill -USR2
    [ $? -eq 0 ] && echo "OK"
  else
-   echo "No ghost runners have been found.This is good."
+   echo "No ghost runners have been found. This is good."
  fi
 }
 

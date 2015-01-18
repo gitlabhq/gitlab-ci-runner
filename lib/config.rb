@@ -9,7 +9,8 @@ module GitlabCi
   class Config
     attr_reader :config
 
-    def initialize
+    def initialize(runner)
+      @runner = runner
       if File.exists?(config_path)
         @config = YAML.load_file(config_path)
       else
@@ -26,7 +27,8 @@ module GitlabCi
     end
 
     def builds_dir
-      @builds_path ||= File.join($root_path, 'tmp', 'builds')
+      rid = "runner-" + @runner.to_s
+      @builds_path ||= File.join($root_path, "tmp", "builds", rid)
     end
 
     def write(key, value)

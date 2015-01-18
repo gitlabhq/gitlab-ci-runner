@@ -5,8 +5,9 @@ module GitlabCi
   class Runner
     attr_accessor :current_build, :thread
 
-    def initialize
-      puts '* Gitlab CI Runner started'
+    def initialize(runner)
+      @runner = runner
+      puts "* Gitlab CI Runner #{@runner} started"
       puts '* Waiting for builds'
       loop do
         if running?
@@ -34,7 +35,7 @@ module GitlabCi
 
     def update_build
       return unless @current_build.completed?
-      puts "#{Time.now.to_s} | Completed build #{@current_build.id}, #{@current_build.state}."
+      puts "#{Time.now.to_s} | Completed build #{@current_build.id}, #{@current_build.state} on runner #{@runner}."
 
       # Make sure we push latest build info submitted
       # before we clean build
@@ -70,14 +71,14 @@ module GitlabCi
     end
 
     def network
-      @network ||= Network.new
+      @network ||= Network.new(@runner)
     end
 
     def run(build_data)
-      @current_build = GitlabCi::Build.new(build_data)
-      puts "#{Time.now.to_s} | Starting new build #{@current_build.id}..."
+      @current_build = GitlabCi::Build.new(@runner, build_data)
+      puts "#{Time.now.to_s} | Starting new build #{@current_build.id} with runner #{@runner}..."
       @current_build.run
-      puts "#{Time.now.to_s} | Build #{@current_build.id} started."
+      puts "#{Time.now.to_s} | Build #{@current_build.id} on runner #{@runner} started."
     end
 
     def collect_trace
