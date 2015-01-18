@@ -47,7 +47,7 @@ module GitlabCi
     def write_token(token)
       puts "Runner token: #{token}"
 
-      Config.new(0).write('token', token)
+      Config.new(0).write("token", token)
     end
   end
 end

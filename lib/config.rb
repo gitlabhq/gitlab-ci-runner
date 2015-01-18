@@ -27,7 +27,7 @@ module GitlabCi
     end
 
     def builds_dir
-      @builds_path ||= File.join($root_path, 'tmp', 'builds', 'runner-' + @runner.to_s)
+      @builds_path ||= File.join($root_path, "tmp", "builds", "runner-" + @runner.to_s)
     end
 
     def write(key, value)
