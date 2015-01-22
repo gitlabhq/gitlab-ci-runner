@@ -1,6 +1,7 @@
-## GitLab CI Runner
+## GitLab Runner
 
-This is GitLab CI **Runner** repository, this application run tests but it doesn't coordinate the testing. In the [GitLab CI repo](https://gitlab.com/gitlab-org/gitlab-ci) you can find the open-source continuous integration server that coordinates the testing.
+This is GitLab Runner repository, this application run tests and sends the results to GitLab CI.
+[GitLab CI](https://about.gitlab.com/gitlab-ci) is the open-source continuous integration server that coordinates the testing.
 
 [![build status](https://ci.gitlab.org/projects/8/status.png?ref=master)](https://ci.gitlab.org/projects/8?ref=master)
 [![Code Climate](https://codeclimate.com/github/gitlabhq/gitlab-ci-runner.png)](https://codeclimate.com/github/gitlabhq/gitlab-ci-runner)
@@ -9,18 +10,20 @@ This is GitLab CI **Runner** repository, this application run tests but it doesn
 
 **This project is designed for the Linux operating system.**
 
-We officially support (recent versions of) these Linux distributions:
+This projects officially support (recent versions of) these Linux distributions:
 
 - Ubuntu Linux
 - Debian/GNU Linux
 
+CentOS and others will likely work as well.
+
 Mac OSX and other POSIX operating systems are not supported but will work with adaptations.
-
 Under Windows the runner will only work under POSIX compliant environments like Cygwin.
-
-To run GitLab CI we recommend using GitLab 6.0 or higher, for LDAP login this is required.
+Also see the alternative Runners for Windows, Scala/Java and Node in the [GitLab CI Readme](https://gitlab.com/gitlab-org/gitlab-ci/blob/master/README.md#gitlab-runner.)
 
 ### Install dependencies
+
+The easiest and recommended way to install the runner is with the [GitLab Runner Omnibus package](https://gitlab.com/gitlab-org/omnibus-gitlab-runner/blob/master/doc/install/README.md).
 
 Install operating system dependent dependencies:
 
@@ -64,11 +67,11 @@ rbenv global 2.0.0-p353
 
 ### Setup runners
 
-Create the CI runner user and clone the gitlab-ci-runner repository:
+Create the runner user and clone the gitlab-ci-runner repository:
 
 ```
 sudo gem install bundler
-sudo adduser --disabled-login --gecos 'GitLab CI Runner' gitlab_ci_runner
+sudo adduser --disabled-login --gecos 'GitLab Runner' gitlab_ci_runner
 sudo su gitlab_ci_runner
 cd ~/
 git clone https://gitlab.com/gitlab-org/gitlab-ci-runner.git
@@ -165,7 +168,7 @@ And restart runner
 
 ## Easily add Runners to existing GitLab CI
 
-GitLab.com uses GitLab-CI to test our own builds. To quickly spin up some extra runners in time of need, we have setup a runner as described above, with all the relevant dependencies for our builds and have taken a snapshot of this runner.
+GitLab.com uses GitLab CI to test our own builds. To quickly spin up some extra runners in time of need, we have setup a runner as described above, with all the relevant dependencies for our builds and have taken a snapshot of this runner.
 
 To quickly add a runner, have the registration token at hand and:
 
