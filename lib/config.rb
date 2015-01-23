@@ -17,6 +17,12 @@ module GitlabCi
       end
     end
 
+    def hostname
+      @config.fetch('hostname') do
+        Socket.gethostname
+      end
+    end
+
     def token
       @config['token']
     end
