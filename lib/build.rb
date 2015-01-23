@@ -144,6 +144,9 @@ module GitlabCi
       @process.environment['CI_BUILD_ID'] = @id
       @process.environment['CI_BUILD_REPO'] = @repo_url
 
+      @process.environment['CI_PROJECT_ID'] = @project_id
+      @process.environment['CI_PROJECT_DIR'] = project_dir
+
       @process.start
 
       @tmp_file_path = @tmp_file.path
