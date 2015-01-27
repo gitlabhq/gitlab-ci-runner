@@ -75,15 +75,30 @@ rbenv global 2.0.0-p353
 
 ### Setup runners
 
-Create the runner user and clone the gitlab-ci-runner repository:
+#### Create the runner user
+
+Ubuntu:
 
 ```
 sudo gem install bundler
 sudo adduser --disabled-login --gecos 'GitLab Runner' gitlab_ci_runner
+```
+
+Centos:
+
+```
+sudo groupadd gitlab_ci_runner
+sudo useradd -g gitlab_ci_runner gitlab_ci_runner
+```
+
+#### Clone the gitlab-ci-runner repository
+
+```
 sudo su gitlab_ci_runner
 cd ~/
 git clone https://gitlab.com/gitlab-org/gitlab-ci-runner.git
 cd gitlab-ci-runner
+git checkout VERSION_YOU_NEED # Ex. v5.0.0
 ```
 
 Install the gems for the runner:
@@ -121,8 +136,7 @@ You can also specify RUNNER_DESCRIPTION and RUNNER_TAG_LIST during setup.
 
 ```
 exit;
-cd /home/gitlab_ci_runner/gitlab-ci-runner
-sudo cp ./lib/support/upstart/gitlab-ci-runner.conf /etc/init/
+sudo cp /home/gitlab_ci_runner/gitlab-ci-runner/lib/support/upstart/gitlab-ci-runner.conf /etc/init/
 ```
 
 
@@ -130,8 +144,7 @@ sudo cp ./lib/support/upstart/gitlab-ci-runner.conf /etc/init/
 
 ```
 exit;
-cd /home/gitlab_ci_runner/gitlab-ci-runner
-sudo cp ./lib/support/init.d/gitlab_ci_runner /etc/init.d/gitlab-ci-runner
+sudo cp /home/gitlab_ci_runner/gitlab-ci-runner/lib/support/init.d/gitlab_ci_runner /etc/init.d/gitlab-ci-runner
 sudo chmod +x /etc/init.d/gitlab-ci-runner
 sudo update-rc.d gitlab-ci-runner defaults 21
 ```
@@ -176,7 +189,7 @@ In order to update the runner to a new version just go to runner directory and d
 sudo su gitlab_ci_runner
 cd ~/gitlab-ci-runner
 git fetch
-git checkout VERSION_YOU_NEED # Ex. v4.0.0
+git checkout VERSION_YOU_NEED # Ex. v5.0.0
 bundle
 ```
 
