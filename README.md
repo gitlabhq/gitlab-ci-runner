@@ -107,6 +107,8 @@ You can tell `bin/setup` to use a different directory with the `-C` switch.
 bin/setup -C /my/runner/working/directory
 ```
 
+You can also specify RUNNER_DESCRIPTION and RUNNER_TAG_LIST during setup.
+
 #### Create an Upstart job (Ubuntu, Centos 6)
 
 ```

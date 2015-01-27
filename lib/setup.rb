@@ -26,13 +26,16 @@ module GitlabCi
 
       until registered
         token = ENV['REGISTRATION_TOKEN']
+        description = ENV['RUNNER_DESCRIPTION'] || Socket.gethostname
+        tag_list = ENV['RUNNER_TAG_LIST']
+
         unless token
           puts 'Please enter the gitlab-ci token for this runner: '
           token = gets.chomp
         end
 
-        puts "Registering runner with registration token: #{token}, url: #{Config.new.url}."
-        runner = Network.new.register_runner(token)
+        puts "Registering runner as #{description} with registration token: #{token}, url: #{Config.new.url}."
+        runner = Network.new.register_runner(token, description, tag_list)
 
         if runner
           write_token(runner[:token])
