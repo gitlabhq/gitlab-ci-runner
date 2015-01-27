@@ -123,9 +123,15 @@ exit;
 cd /home/gitlab_ci_runner/gitlab-ci-runner
 sudo cp ./lib/support/init.d/gitlab_ci_runner /etc/init.d/gitlab-ci-runner
 sudo chmod +x /etc/init.d/gitlab-ci-runner
-sudo update-rc.d gitlab-ci-runner defaults 21 
+sudo update-rc.d gitlab-ci-runner defaults 21
 ```
 
+### Runners default file
+
+```
+cd /home/gitlab_ci_runner/gitlab-ci-runner
+sudo cp ./lib/support/init.d/gitlab_ci_runner.default.example /etc/default/gitlab_ci_runner
+```
 
 ### Run
 
@@ -154,7 +160,7 @@ bundle exec bin/runner -C /my/runner/working/directory
 
 ### Update
 
-In order to update the runner to a new version just go to runner directory and do next: 
+In order to update the runner to a new version just go to runner directory and do next:
 
 ```bash
 sudo su gitlab_ci_runner
@@ -181,4 +187,3 @@ Now the runner will start to pick up builds automatically. When you are done wit
 ## Development
 
 To work on the GitLab runner we recommend you install the [GitLab Development Kit](https://gitlab.com/gitlab-org/gitlab-development-kit).
-
