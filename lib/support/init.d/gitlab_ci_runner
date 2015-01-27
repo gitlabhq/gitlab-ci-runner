@@ -7,7 +7,7 @@
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: GitLab CI Runner init.d script
-# Description:       Enables automatic start of runners at boot time in the background.
+# Description: Enables automatic start of runners at boot time in the background.
 ### END INIT INFO
 
 APP_ROOT="/home/gitlab_ci_runner/gitlab-ci-runner"
@@ -20,6 +20,9 @@ NAME="gitlab-ci-runner"
 DESC="GitLab CI runner"
 RUNNERS_REGISTERED=0
 INIT_LOG="/var/log/gitlab_ci_runner.log"
+
+# Read configuration variable file if it is present
+test -f /etc/default/gitlab_ci_runner && . /etc/default/gitlab_ci_runner
 
 check_pid() {
   PROCESS_ID=0
@@ -45,7 +48,6 @@ start() {
       [ ! -f $PID_PATH ] && execute "mkdir -p $PID_PATH"
       [ -f $RUNNER_PID ] && execute "rm -f $RUNNER_PID"
 
-      
       # Check log file
       if [ ! -f $INIT_LOG ]; then
         touch $INIT_LOG
@@ -60,7 +62,7 @@ start() {
 stop() {
  check_pid
  echo -n "Trying to stop registered runner..."
- 
+
  if [ $PROCESS_ID -gt 0 ]; then
    execute "cat $RUNNER_PID | xargs kill -USR2"
    rm -f $RUNNER_PID
@@ -84,22 +86,22 @@ fi
 
 case "$1" in
   start)
-        start
-        ;;
+    start
+    ;;
  stop)
-        stop
-        ;;
+    stop
+    ;;
   restart)
-        stop
-        start
-        ;;
+    stop
+    start
+    ;;
   status)
-        status
-        ;;
+    status
+    ;;
   *)
-        echo "Usage: sudo service gitlab_ci_runner {start|stop|restart|status}" >&2
-        exit 1
-        ;;
+    echo "Usage: sudo service gitlab_ci_runner {start|stop|restart|status}" >&2
+    exit 1
+    ;;
 esac
 
 exit 0
