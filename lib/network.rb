@@ -73,10 +73,11 @@ module GitlabCi
       :failure
     end
 
-    def register_runner(token)
+    def register_runner(token, description, tag_list)
       body = {
         token: token,
-        hostname: config.hostname
+        tag_list: tag_list,
+        description: description
       }
 
       opts = {
