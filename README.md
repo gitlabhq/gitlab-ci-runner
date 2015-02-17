@@ -8,18 +8,26 @@ This is GitLab Runner repository, this application run tests and sends the resul
 
 ### Requirements
 
-**This project is designed for the Linux operating system.**
+### Omnibus packages and other platforms
 
-This projects officially support (recent versions of) these Linux distributions:
+The recommended way to install this runner are the Omnibus packages.
+GitLab runners are also available for all kinds of other platforms such as Windows and OSX.
+For more information about both please see the runner section of the [GitLab CI page on the website](https://about.gitlab.com/gitlab-ci/).
 
-- Ubuntu Linux
-- Debian/GNU Linux
+### Supported platforms
 
-CentOS and others will likely work as well.
+This projects officially support these Linux distributions:
+
+- Ubuntu
+- Debian
+- CentOS
+- Red Hat Enterprise Linux
+- Scientific Linux
+- Oracle Linux
 
 Mac OSX and other POSIX operating systems are not supported but will work with adaptations.
 Under Windows the runner will only work under POSIX compliant environments like Cygwin.
-Also see the alternative Runners for Windows, Scala/Java and Node in the [GitLab CI Readme](https://gitlab.com/gitlab-org/gitlab-ci/blob/master/README.md#gitlab-runner.)
+Also see the alternative Runners for Windows, Scala/Java and Node please see the runner section of the [GitLab CI page on the website](https://about.gitlab.com/gitlab-ci/).
 
 ### Install dependencies
 
