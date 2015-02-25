@@ -122,7 +122,7 @@ You can also specify RUNNER_DESCRIPTION and RUNNER_TAG_LIST during setup.
 ```
 exit;
 cd /home/gitlab_ci_runner/gitlab-ci-runner
-sudo cp ./lib/support/upstart/gitlab-ci-runner.conf /etc/init.d/
+sudo cp ./lib/support/upstart/gitlab-ci-runner.conf /etc/init/
 ```
 
 
