@@ -45,7 +45,7 @@ sudo apt-get install -y wget curl gcc libxml2-dev libxslt-dev libcurl4-openssl-d
 b) MacOSX (make sure you have [homebrew](http://brew.sh/) installed)
 
 ```bash
-sudo brew install icu4c
+brew install icu4c
 ```
 
 Install Ruby from source:
