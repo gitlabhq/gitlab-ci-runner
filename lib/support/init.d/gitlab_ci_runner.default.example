@@ -22,4 +22,4 @@ INIT_LOG="/var/log/gitlab_ci_runner.log"
 
 # runners_pid_path defines a file in which the individual runners place their pids.
 # The default is "$pid_path/runners.pid"
-RUNNERS_PID="$PID_PATH/runners.pid"
+RUNNER_PID="$PID_PATH/runners.pid"
