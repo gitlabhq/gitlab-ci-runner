@@ -37,6 +37,10 @@ module GitlabCi
       end
     end
 
+    def destroy
+      File.delete(config_path)
+    end
+
     private
 
     def config_path
