@@ -197,15 +197,7 @@ And restart runner
 
 ## Easily add Runners to existing GitLab CI
 
-GitLab.com uses GitLab CI to test our own builds. To quickly spin up some extra runners in time of need, we have setup a runner as described above, with all the relevant dependencies for our builds and have taken a snapshot of this runner.
-
-To quickly add a runner, have the registration token at hand and:
-
-- instantiate a new VPS with the snapshot `gitlab-ci-runner-2gb-2gbswap`
-- `bundle exec ./bin/setup`
-- `sudo service gitlab-ci-runner start`
-
-Now the runner will start to pick up builds automatically. When you are done with it, you can destroy the VPS without worrying about anything. For testing GitLab itself, use of a runner with >= 2GB RAM is recommended.
+See [omnibus gitlab runner](https://gitlab.com/gitlab-org/omnibus-gitlab-runner/blob/master/doc/install/README.md).
 
 ## Development
 
