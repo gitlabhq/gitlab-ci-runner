@@ -117,6 +117,14 @@ bin/setup -C /my/runner/working/directory
 
 You can also specify RUNNER_DESCRIPTION and RUNNER_TAG_LIST during setup.
 
+To unlink the runner from the coordinator you can run following command:
+
+```
+bin/unlink
+```
+
+It will remove the runner's information from the coordinator and remove the given token from the current runner
+
 #### Create an Upstart job (Ubuntu, Centos 6)
 
 ```
