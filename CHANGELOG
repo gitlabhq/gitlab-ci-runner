@@ -1,3 +1,6 @@
+v5.2.1
+  - Add ability to unlink runner from CI coordinator
+
 v5.2.0
   - Add RUNNER_DESCRIPTION and RUNNER_TAG_LIST that can be send during runner's registration
 

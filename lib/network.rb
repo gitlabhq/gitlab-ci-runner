@@ -94,6 +94,17 @@ module GitlabCi
       end
     end
 
+    def unlink_runner
+      opts = {
+        body: default_options.to_json,
+        headers: {"Content-Type" => "application/json"},
+      }
+
+      response = self.class.delete(api_url + '/runners/delete', opts)
+
+      response.code == 200
+    end
+
     private
 
     def broadcast message
