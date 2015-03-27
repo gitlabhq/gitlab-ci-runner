@@ -45,7 +45,7 @@ sudo apt-get install -y wget curl gcc libxml2-dev libxslt-dev libcurl4-openssl-d
 b) MacOSX (make sure you have [homebrew](http://brew.sh/) installed)
 
 ```bash
-sudo brew install icu4c
+brew install icu4c
 ```
 
 Install Ruby from source:
@@ -130,7 +130,7 @@ It will remove the runner's information from the coordinator and remove the give
 ```
 exit;
 cd /home/gitlab_ci_runner/gitlab-ci-runner
-sudo cp ./lib/support/upstart/gitlab-ci-runner.conf /etc/init.d/
+sudo cp ./lib/support/upstart/gitlab-ci-runner.conf /etc/init/
 ```
 
 
