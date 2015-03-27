@@ -75,15 +75,30 @@ rbenv global 2.0.0-p353
 
 ### Setup runners
 
-Create the runner user and clone the gitlab-ci-runner repository:
+#### Create the runner user
+
+Ubuntu:
 
 ```
 sudo gem install bundler
 sudo adduser --disabled-login --gecos 'GitLab Runner' gitlab_ci_runner
+```
+
+Centos:
+
+```
+sudo groupadd gitlab_ci_runner
+sudo useradd -g gitlab_ci_runner gitlab_ci_runner
+```
+
+#### Clone the gitlab-ci-runner repository
+
+```
 sudo su gitlab_ci_runner
 cd ~/
 git clone https://gitlab.com/gitlab-org/gitlab-ci-runner.git
 cd gitlab-ci-runner
+git checkout VERSION_YOU_NEED # Ex. v5.0.0
 ```
 
 Install the gems for the runner:
@@ -129,8 +144,7 @@ It will remove the runner's information from the coordinator and remove the give
 
 ```
 exit;
-cd /home/gitlab_ci_runner/gitlab-ci-runner
-sudo cp ./lib/support/upstart/gitlab-ci-runner.conf /etc/init/
+sudo cp /home/gitlab_ci_runner/gitlab-ci-runner/lib/support/upstart/gitlab-ci-runner.conf /etc/init/
 ```
 
 
@@ -138,8 +152,7 @@ sudo cp ./lib/support/upstart/gitlab-ci-runner.conf /etc/init/
 
 ```
 exit;
-cd /home/gitlab_ci_runner/gitlab-ci-runner
-sudo cp ./lib/support/init.d/gitlab_ci_runner /etc/init.d/gitlab-ci-runner
+sudo cp /home/gitlab_ci_runner/gitlab-ci-runner/lib/support/init.d/gitlab_ci_runner /etc/init.d/gitlab-ci-runner
 sudo chmod +x /etc/init.d/gitlab-ci-runner
 sudo update-rc.d gitlab-ci-runner defaults 21
 ```
@@ -184,7 +197,7 @@ In order to update the runner to a new version just go to runner directory and d
 sudo su gitlab_ci_runner
 cd ~/gitlab-ci-runner
 git fetch
-git checkout VERSION_YOU_NEED # Ex. v4.0.0
+git checkout VERSION_YOU_NEED # Ex. v5.0.0
 bundle
 ```
 
@@ -192,15 +205,7 @@ And restart runner
 
 ## Easily add Runners to existing GitLab CI
 
-GitLab.com uses GitLab CI to test our own builds. To quickly spin up some extra runners in time of need, we have setup a runner as described above, with all the relevant dependencies for our builds and have taken a snapshot of this runner.
-
-To quickly add a runner, have the registration token at hand and:
-
-- instantiate a new VPS with the snapshot `gitlab-ci-runner-2gb-2gbswap`
-- `bundle exec ./bin/setup`
-- `sudo service gitlab-ci-runner start`
-
-Now the runner will start to pick up builds automatically. When you are done with it, you can destroy the VPS without worrying about anything. For testing GitLab itself, use of a runner with >= 2GB RAM is recommended.
+See [omnibus gitlab runner](https://gitlab.com/gitlab-org/omnibus-gitlab-runner/blob/master/doc/install/README.md).
 
 ## Development
 

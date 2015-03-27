@@ -3,6 +3,7 @@ v5.2.1
 
 v5.2.0
   - Add RUNNER_DESCRIPTION and RUNNER_TAG_LIST that can be send during runner's registration
+  - Updated installation documentation
 
 v5.1.0
   - Add `-C` command-line option to specify the working directory
