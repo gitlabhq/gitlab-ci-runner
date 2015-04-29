@@ -183,9 +183,9 @@ module GitlabCi
     end
 
     def git_clean_opts
-      opts = @cache_pattern_list.collect { |item| "--exclude='#{item}'"}
-      opts.unshift("-fdx")
-      opts.join(" ")
+      opts = @cache_pattern_list.map { |item| "--exclude='#{item}'" }
+      opts.unshift('-fdx')
+      opts.join(' ')
     end
 
     def repo_exists?
