@@ -36,6 +36,7 @@ module GitlabCi
           ref_name: response['ref'],
           before_sha: response['before_sha'],
           allow_git_fetch: response['allow_git_fetch'],
+          cache_pattern_list: response['cache_pattern_list'],
           timeout: response['timeout']
         }
       elsif response.code == 403

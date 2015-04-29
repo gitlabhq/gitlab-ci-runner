@@ -25,6 +25,7 @@ module GitlabCi
       @before_sha = data[:before_sha]
       @timeout = data[:timeout] || TIMEOUT
       @allow_git_fetch = data[:allow_git_fetch]
+      @cache_pattern_list = data[:cache_pattern_list] || []
     end
 
     def run
@@ -175,10 +176,16 @@ module GitlabCi
       cmd = []
       cmd << "cd #{project_dir}"
       cmd << "git reset --hard"
-      cmd << "git clean -fdx"
+      cmd << "git clean #{git_clean_opts}"
       cmd << "git remote set-url origin #{@repo_url}"
       cmd << "git fetch origin"
       cmd.join(" && ")
+    end
+
+    def git_clean_opts
+      opts = @cache_pattern_list.collect { |item| "--exclude='#{item}'"}
+      opts.unshift("-fdx")
+      opts.join(" ")
     end
 
     def repo_exists?
