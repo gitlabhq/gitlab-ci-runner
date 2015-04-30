@@ -42,12 +42,11 @@ module GitlabCi
       end
 
       @run_file.puts %|#!/bin/bash|
-      @run_file.puts %|set -e|
       @run_file.puts %|trap 'kill -s INT 0' EXIT|
+      @run_file.puts %|set -ex|
 
       @commands.each do |command|
         command.strip!
-        @run_file.puts %|echo #{command.shellescape}|
         @run_file.puts(command)
       end
       @run_file.close
