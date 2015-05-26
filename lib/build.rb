@@ -175,7 +175,7 @@ module GitlabCi
       cmd = []
       cmd << "cd #{project_dir}"
       cmd << "git reset --hard"
-      cmd << "git clean -fdx"
+      cmd << "git clean -ffdx"
       cmd << "git remote set-url origin #{@repo_url}"
       cmd << "git fetch origin"
       cmd.join(" && ")
