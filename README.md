@@ -1,3 +1,5 @@
+## GitLab Runner PROJECT IS DEPRECATED NOW, PLEASE USE NEW [GitLab CI Multu Runner](https://gitlab.com/gitlab-org/gitlab-ci-multi-runner) INSTEAD
+
 ## GitLab Runner
 
 This is GitLab Runner repository, this application run tests and sends the results to GitLab CI.
