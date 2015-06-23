@@ -1,4 +1,4 @@
-## GitLab Runner PROJECT IS DEPRECATED NOW, PLEASE USE NEW [GitLab CI Multu Runner](https://gitlab.com/gitlab-org/gitlab-ci-multi-runner) INSTEAD
+## GitLab Runner PROJECT IS DEPRECATED NOW, PLEASE USE NEW [GitLab Runner written in Go (previously named GitLab CI Multi Runner)](https://gitlab.com/gitlab-org/gitlab-ci-multi-runner) INSTEAD
 
 ## GitLab Runner
 
