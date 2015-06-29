@@ -50,6 +50,8 @@ module GitlabCi
     def update_build(id, state, trace)
       broadcast "Submitting build #{id} to coordinator..."
 
+      trace = trace.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+
       options = default_options.merge(
         state: state,
         trace: trace,
