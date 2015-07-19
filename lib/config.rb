@@ -29,6 +29,10 @@ module GitlabCi
       @builds_path ||= File.join($root_path, 'tmp', 'builds')
     end
 
+    def jobs_dir
+      @jobs_path ||= File.join($root_path, 'tmp', 'jobs')
+    end
+
     def write(key, value)
       @config[key] = value
 

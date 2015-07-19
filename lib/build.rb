@@ -28,7 +28,9 @@ module GitlabCi
     end
 
     def run
-      @run_file = Tempfile.new("executor")
+      FileUtils.mkdir_p(config.jobs_dir) unless File.exists?(config.jobs_dir)
+
+      @run_file = Tempfile.new("executor", config.jobs_dir)
       @run_file.chmod(0700)
 
       @commands.unshift(checkout_cmd)
