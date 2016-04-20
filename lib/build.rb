@@ -116,7 +116,7 @@ module GitlabCi
     def timeout_abort
       self.abort
 
-      @post_message = "\nCI Timeout. Execution took longer then #{@timeout} seconds"
+      @post_message = "\nCI Timeout. Execution took longer than #{@timeout} seconds"
     end
 
     private
