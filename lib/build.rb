@@ -9,7 +9,7 @@ require 'shellwords'
 
 module GitlabCi
   class Build
-    TIMEOUT = 7200
+    TIMEOUT = 14400
 
     attr_accessor :id, :commands, :ref, :tmp_file_path, :output, :before_sha, :run_at, :post_message
 
